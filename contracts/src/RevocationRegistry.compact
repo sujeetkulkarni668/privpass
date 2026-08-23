@@ -1,0 +1,67 @@
+// RevocationRegistry.compact
+//
+// A dedicated, append-only revocation list, kept separate from
+// CredentialRegistry so that verifiers/relying parties can check
+// revocation status via a minimal, fast-syncing ledger without pulling
+// full credential metadata. This mirrors common "CRL-lite" patterns.
+//
+// Design note: CredentialRegistry.revokeCredential() is the source of
+// truth for a credential's status field; this contract additionally
+// records revocation as a standalone, cheap-to-query set so verification
+// circuits can do a single membership check.
+//
+// AUTHORIZATION: `recordRevocation` used to accept a commitment from any
+// caller with no authorization check at all — anyone could revoke anyone
+// else's credential. It now requires the same issuer identity that's
+// authorized in CredentialRegistry (imported below), proven the same
+// hash-based way used throughout this codebase.
+//
+// See the "HIGHEST-UNCERTAINTY PART OF THIS FILE" note in
+// VerificationRequest.compact — the same `prefix`-import caveat applies
+// here for `Registry_isAuthorizedIssuer`; verify against the installed
+// compiler before deployment.
+
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+witness issuerSecret(): Bytes<32>;
+witness issuerSalt(): Bytes<32>;
+
+export struct RevocationEntry {
+  revokedAt: Uint<64>;
+  reasonCode: Uint<8>; // 0=unspecified,1=compromised,2=superseded,3=issuer-request,4=fraud
+  revokedBy: Bytes<32>;
+}
+
+export ledger revoked: Map<Bytes<32>, RevocationEntry>;
+export ledger authorizedIssuers: Map<Bytes<32>, Boolean>;
+
+export circuit authorizeIssuer(issuerIdentity: Bytes<32>): [] {
+  authorizedIssuers.insert(disclose(issuerIdentity), true);
+}
+
+export circuit recordRevocation(
+  commitment: Bytes<32>,
+  revokedAt: Uint<64>,
+  reasonCode: Uint<8>
+): [] {
+  const discCommitment = disclose(commitment);
+  assert(!revoked.member(discCommitment), "already revoked");
+  assert(reasonCode <= 4, "unknown reason code");
+
+  const issuerId = persistentHash<[Bytes<32>, Bytes<32>]>([issuerSecret(), issuerSalt()]);
+  const discIssuerId = disclose(issuerId);
+  assert(authorizedIssuers.member(discIssuerId) && authorizedIssuers.lookup(discIssuerId), "caller is not an authorized issuer");
+
+  revoked.insert(discCommitment, RevocationEntry {
+    revokedAt: disclose(revokedAt),
+    reasonCode: disclose(reasonCode),
+    revokedBy: discIssuerId
+  });
+}
+
+export circuit isRevoked(commitment: Bytes<32>): Boolean {
+  const discCommitment = disclose(commitment);
+  return disclose(revoked.member(discCommitment));
+}

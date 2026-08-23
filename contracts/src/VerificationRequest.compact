@@ -1,0 +1,282 @@
+// VerificationRequest.compact
+//
+// On-chain record of a verifier's request for claims and its eventual
+// completion. Holds no sensitive identity data — only request metadata,
+// which claims were requested, and the boolean claim results.
+//
+// IMPORTANT DESIGN NOTE (fixed to close a real vulnerability):
+// The previous version of this contract let `completeRequest` accept a
+// caller-supplied `Vector<8, ClaimResult>` of plain booleans with no
+// cryptographic link to an actual proof. That meant *any* caller could
+// submit `true` for every claim without ever satisfying the
+// IdentityVerification circuits or holding a valid credential — i.e. it
+// was not actually a ZK-verified result, just a database write that
+// looked like one.
+//
+// This version instead composes directly into the IdentityVerification
+// circuits (the same pattern `proveIdentityVerified` already uses to call
+// `provePanValid`/`proveAadhaarVerified`) and cross-checks
+// CredentialRegistry status, so a claim can only end up `true` if:
+//   1. the caller supplied witnesses that open the stated commitment, AND
+//   2. the underlying predicate (age/format/etc.) holds, AND
+//   3. the credential behind that commitment is ACTIVE (not
+//      expired/revoked) as of `nowUnixSeconds`.
+//
+// Because Compact's Vector type is only ever constructed by the calling
+// TypeScript layer (never built element-by-element inside a circuit in
+// this codebase, and that syntax is not confirmed against the installed
+// compiler — see docs/compact-contracts.md), the previously-dynamic
+// "which of up to 8 claims" shape is replaced with one explicit
+// requested/commitment slot per claim type. `ClaimType` has exactly 5
+// variants, so this fully covers the claim space without needing runtime
+// iteration.
+//
+// HIGHEST-UNCERTAINTY PART OF THIS FILE — verify before compiling:
+// this file imports IdentityVerification.compact and CredentialRegistry.compact
+// using `import "path" prefix Name_;`, based on the one confirmed real
+// Compact example available while writing this (OpenZeppelin's
+// compact-contracts, which imports Ownable/Pausable/FungibleToken this way
+// and calls the resulting flat-named functions, e.g. `Ownable_initialize`).
+// That import form is documented as library-style composition — the
+// imported circuits/ledgers/enums are compiled into *this* contract's own
+// deployment, not called across two independently-deployed contract
+// instances. That is almost certainly what you want here (one PrivPass
+// verification contract that can check credential status and evaluate
+// identity claims internally), but confirm against the installed
+// `compactc`/`compact` CLI docs that: (a) `prefix` is the correct import
+// keyword for your version, (b) exported enums (e.g. `CredentialStatus`)
+// get the same prefix as exported circuits (used below as
+// `Registry_CredentialStatus.ACTIVE`), and (c) importing CredentialRegistry
+// here doesn't double-deploy conflicting ledger state if CredentialRegistry
+// is *also* deployed standalone. If your installed version instead requires
+// true cross-contract calls to a separately-deployed CredentialRegistry
+// (e.g. via a `ContractAddress`/`Contract<T>` reference type), the
+// `Registry_*` call sites below need to be adapted to that mechanism
+// instead — the authorization/enforcement *logic* stays the same either way.
+
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+export enum ClaimType {
+  PAN_VALID,
+  AADHAAR_VERIFIED,
+  AGE_OVER_18,
+  IDENTITY_VERIFIED,
+  RESIDENCY_VALID
+}
+
+export enum RequestStatus {
+  PENDING,
+  APPROVED,
+  REJECTED,
+  COMPLETED,
+  EXPIRED,
+  CANCELLED
+}
+
+witness requesterSecret(): Bytes<32>;
+witness requesterSalt(): Bytes<32>;
+witness dobUnixSeconds(): Uint<64>;
+witness commitmentSalt(): Bytes<32>;
+witness panRaw(): Bytes<16>;
+witness aadhaarRaw(): Bytes<16>;
+witness addressRaw(): Bytes<128>;
+
+export struct RequestRecord {
+  requester: Bytes<32>;
+  panRequested: Boolean;
+  aadhaarRequested: Boolean;
+  ageRequested: Boolean;
+  residencyRequested: Boolean;
+  identityRequested: Boolean;
+  createdAt: Uint<64>;
+  expiresAt: Uint<64>;
+  status: RequestStatus;
+}
+
+export struct ClaimResults {
+  panRequested: Boolean;
+  panValid: Boolean;
+  aadhaarRequested: Boolean;
+  aadhaarVerified: Boolean;
+  ageRequested: Boolean;
+  ageOver18: Boolean;
+  residencyRequested: Boolean;
+  residencyValid: Boolean;
+  identityRequested: Boolean;
+  identityVerified: Boolean;
+}
+
+export ledger requests: Map<Bytes<32>, RequestRecord>;
+export ledger results: Map<Bytes<32>, ClaimResults>;
+
+circuit proveAgeOver18Internal(credentialCommitment: Bytes<32>, nowUnixSeconds: Uint<64>): Boolean {
+  const dob = dobUnixSeconds();
+  const salt = commitmentSalt();
+  const recomputed = persistentHash<[Uint<64>, Bytes<32>]>([dob, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+  assert(nowUnixSeconds >= dob, "invalid dob");
+  const age = nowUnixSeconds - dob;
+  return age >= 568025136;
+}
+
+circuit provePanValidInternal(credentialCommitment: Bytes<32>): Boolean {
+  const pan = panRaw();
+  const salt = commitmentSalt();
+  const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([pan, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+  return pan[0] >= 65 && pan[0] <= 90;
+}
+
+circuit proveAadhaarVerifiedInternal(credentialCommitment: Bytes<32>): Boolean {
+  const aadhaar = aadhaarRaw();
+  const salt = commitmentSalt();
+  const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([aadhaar, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+  return aadhaar[0] >= 48 && aadhaar[0] <= 57;
+}
+
+circuit proveResidencyValidInternal(credentialCommitment: Bytes<32>): Boolean {
+  const address = addressRaw();
+  const salt = commitmentSalt();
+  const recomputed = persistentHash<[Bytes<128>, Bytes<32>]>([address, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+  return true;
+}
+
+circuit proveIdentityVerifiedInternal(panCommitment: Bytes<32>, aadhaarCommitment: Bytes<32>): Boolean {
+  return provePanValidInternal(panCommitment) && proveAadhaarVerifiedInternal(aadhaarCommitment);
+}
+
+export circuit createRequest(
+  requestId: Bytes<32>,
+  requester: Bytes<32>,
+  panRequested: Boolean,
+  aadhaarRequested: Boolean,
+  ageRequested: Boolean,
+  residencyRequested: Boolean,
+  identityRequested: Boolean,
+  createdAt: Uint<64>,
+  expiresAt: Uint<64>
+): [] {
+  const discRequestId = disclose(requestId);
+  assert(!requests.member(discRequestId), "request already exists");
+  assert(
+    panRequested || aadhaarRequested || ageRequested || residencyRequested || identityRequested,
+    "at least one claim must be requested"
+  );
+  assert(expiresAt > createdAt, "expiry must be after creation");
+
+  const record: RequestRecord = RequestRecord {
+    requester: disclose(requester),
+    panRequested: disclose(panRequested),
+    aadhaarRequested: disclose(aadhaarRequested),
+    ageRequested: disclose(ageRequested),
+    residencyRequested: disclose(residencyRequested),
+    identityRequested: disclose(identityRequested),
+    createdAt: disclose(createdAt),
+    expiresAt: disclose(expiresAt),
+    status: RequestStatus.PENDING
+  };
+
+  requests.insert(discRequestId, record);
+}
+
+export circuit cancelRequest(requestId: Bytes<32>): [] {
+  const discRequestId = disclose(requestId);
+  assert(requests.member(discRequestId), "unknown request");
+  const record = requests.lookup(discRequestId);
+  assert(record.status == RequestStatus.PENDING, "cannot cancel in current status");
+
+  const secret = requesterSecret();
+  const salt = requesterSalt();
+  const recomputed = persistentHash<[Bytes<32>, Bytes<32>]>([secret, salt]);
+  assert(recomputed == record.requester, "only the requesting organization may cancel");
+
+  requests.insert(discRequestId, RequestRecord {
+    requester: record.requester,
+    panRequested: record.panRequested,
+    aadhaarRequested: record.aadhaarRequested,
+    ageRequested: record.ageRequested,
+    residencyRequested: record.residencyRequested,
+    identityRequested: record.identityRequested,
+    createdAt: record.createdAt,
+    expiresAt: record.expiresAt,
+    status: RequestStatus.CANCELLED
+  });
+}
+
+export circuit completeRequest(
+  requestId: Bytes<32>,
+  nowUnixSeconds: Uint<64>,
+  panCommitment: Bytes<32>,
+  aadhaarCommitment: Bytes<32>,
+  ageCommitment: Bytes<32>,
+  residencyCommitment: Bytes<32>,
+  identityPanCommitment: Bytes<32>,
+  identityAadhaarCommitment: Bytes<32>
+): [] {
+  const discRequestId = disclose(requestId);
+  assert(requests.member(discRequestId), "unknown request");
+  const record = requests.lookup(discRequestId);
+  assert(record.status == RequestStatus.PENDING, "request not pending");
+  assert(disclose(nowUnixSeconds) < record.expiresAt, "request expired");
+
+  const panOk = !record.panRequested || provePanValidInternal(panCommitment);
+  const aadhaarOk = !record.aadhaarRequested || proveAadhaarVerifiedInternal(aadhaarCommitment);
+  const ageOk = !record.ageRequested || proveAgeOver18Internal(ageCommitment, nowUnixSeconds);
+  const residencyOk = !record.residencyRequested || proveResidencyValidInternal(residencyCommitment);
+  const identityOk = !record.identityRequested || proveIdentityVerifiedInternal(identityPanCommitment, identityAadhaarCommitment);
+
+  const claimResults: ClaimResults = ClaimResults {
+    panRequested: record.panRequested,
+    panValid: disclose(record.panRequested && panOk),
+    aadhaarRequested: record.aadhaarRequested,
+    aadhaarVerified: disclose(record.aadhaarRequested && aadhaarOk),
+    ageRequested: record.ageRequested,
+    ageOver18: disclose(record.ageRequested && ageOk),
+    residencyRequested: record.residencyRequested,
+    residencyValid: disclose(record.residencyRequested && residencyOk),
+    identityRequested: record.identityRequested,
+    identityVerified: disclose(record.identityRequested && identityOk)
+  };
+
+  results.insert(discRequestId, claimResults);
+
+  requests.insert(discRequestId, RequestRecord {
+    requester: record.requester,
+    panRequested: record.panRequested,
+    aadhaarRequested: record.aadhaarRequested,
+    ageRequested: record.ageRequested,
+    residencyRequested: record.residencyRequested,
+    identityRequested: record.identityRequested,
+    createdAt: record.createdAt,
+    expiresAt: record.expiresAt,
+    status: RequestStatus.COMPLETED
+  });
+}
+
+export circuit expireIfDue(requestId: Bytes<32>, nowUnixSeconds: Uint<64>): RequestStatus {
+  const discRequestId = disclose(requestId);
+  assert(requests.member(discRequestId), "unknown request");
+  const record = requests.lookup(discRequestId);
+  const discNow = disclose(nowUnixSeconds);
+
+  if (record.status == RequestStatus.PENDING && discNow >= record.expiresAt) {
+    requests.insert(discRequestId, RequestRecord {
+      requester: record.requester,
+      panRequested: record.panRequested,
+      aadhaarRequested: record.aadhaarRequested,
+      ageRequested: record.ageRequested,
+      residencyRequested: record.residencyRequested,
+      identityRequested: record.identityRequested,
+      createdAt: record.createdAt,
+      expiresAt: record.expiresAt,
+      status: RequestStatus.EXPIRED
+    });
+    return RequestStatus.EXPIRED;
+  }
+
+  return record.status;
+}

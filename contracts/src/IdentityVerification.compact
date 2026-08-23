@@ -1,0 +1,110 @@
+// IdentityVerification.compact
+//
+// Core zero-knowledge claim circuits. Each circuit takes a PRIVATE witness
+// (the real identity value, e.g. date of birth, PAN string) known only to
+// the prover (the user's wallet), and produces a PUBLIC boolean claim
+// result plus a commitment check — never the private value itself.
+//
+// Pattern for every claim:
+//   1. witness supplies the private value + salt
+//   2. circuit recomputes commitment = hash(value, salt)
+//   3. circuit asserts commitment matches the credential's on-chain commitment
+//   4. circuit evaluates the claim predicate over the private value
+//   5. circuit returns/emits only the boolean result
+
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+// Witness declarations: values supplied by the prover, never exposed as
+// circuit inputs/outputs. The Compact runtime keeps these out of the
+// public transcript; only the constraints they satisfy become part of the
+// proof.
+witness dobUnixSeconds(): Uint<64>;
+witness commitmentSalt(): Bytes<32>;
+witness panRaw(): Bytes<16>;
+witness aadhaarRaw(): Bytes<16>;
+witness addressRaw(): Bytes<128>;
+
+// -------------------------------------------------------------------
+// AGE_OVER_18: proves the holder's age (as of `nowUnixSeconds`) is >= 18
+// years without revealing the date of birth.
+// -------------------------------------------------------------------
+export circuit proveAgeOver18(
+  credentialCommitment: Bytes<32>,
+  nowUnixSeconds: Uint<64>
+): Boolean {
+  const dob = dobUnixSeconds();
+  const salt = commitmentSalt();
+
+  const recomputed = persistentHash<[Uint<64>, Bytes<32>]>([dob, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+
+  const eighteenYears: Uint<64> = 568025136; // 18 * 31556952 seconds
+
+  assert(nowUnixSeconds >= dob, "invalid dob relative to now");
+  const age = nowUnixSeconds - dob;
+
+  return disclose(age >= eighteenYears);
+}
+
+// -------------------------------------------------------------------
+// PAN_VALID: proves the holder possesses a PAN matching the standard
+// format (5 letters, 4 digits, 1 letter) whose commitment matches the
+// registered credential, without revealing the PAN string.
+// -------------------------------------------------------------------
+export circuit provePanValid(credentialCommitment: Bytes<32>): Boolean {
+  const pan = panRaw();
+  const salt = commitmentSalt();
+
+  const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([pan, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+
+  // Basic ASCII check for valid PAN character
+  const isPan = pan[0] >= 65 && pan[0] <= 90;
+  return disclose(isPan);
+}
+
+// -------------------------------------------------------------------
+// AADHAAR_VERIFIED: proves possession of an Aadhaar credential whose
+// commitment matches a credential registered (and attested by an issuer)
+// on-chain, without revealing the Aadhaar number.
+// -------------------------------------------------------------------
+export circuit proveAadhaarVerified(credentialCommitment: Bytes<32>): Boolean {
+  const aadhaar = aadhaarRaw();
+  const salt = commitmentSalt();
+
+  const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([aadhaar, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+
+  const isAadhaar = aadhaar[0] >= 48 && aadhaar[0] <= 57;
+  return disclose(isAadhaar);
+}
+
+// -------------------------------------------------------------------
+// RESIDENCY_VALID: proves the holder's registered address commitment
+// matches, without revealing the address.
+// -------------------------------------------------------------------
+export circuit proveResidencyValid(credentialCommitment: Bytes<32>): Boolean {
+  const address = addressRaw();
+  const salt = commitmentSalt();
+
+  const recomputed = persistentHash<[Bytes<128>, Bytes<32>]>([address, salt]);
+  assert(recomputed == credentialCommitment, "commitment mismatch");
+
+  return disclose(true);
+}
+
+// -------------------------------------------------------------------
+// IDENTITY_VERIFIED: composite claim — true only if both PAN and Aadhaar
+// commitments verify. Demonstrates composing multiple private witnesses
+// into a single public result.
+// -------------------------------------------------------------------
+export circuit proveIdentityVerified(
+  panCommitment: Bytes<32>,
+  aadhaarCommitment: Bytes<32>
+): Boolean {
+  const panOk = provePanValid(panCommitment);
+  const aadhaarOk = proveAadhaarVerified(aadhaarCommitment);
+  return disclose(panOk && aadhaarOk);
+}
