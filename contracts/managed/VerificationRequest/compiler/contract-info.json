@@ -1,0 +1,424 @@
+{
+  "compiler-version": "0.31.1",
+  "language-version": "0.23.0",
+  "runtime-version": "0.16.0",
+  "circuits": [
+    {
+      "name": "createRequest",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "requestId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "requester",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "panRequested",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "aadhaarRequested",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "ageRequested",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "residencyRequested",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "identityRequested",
+          "type": {
+            "type-name": "Boolean"
+          }
+        },
+        {
+          "name": "createdAt",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        },
+        {
+          "name": "expiresAt",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "cancelRequest",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "requestId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "completeRequest",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "requestId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "nowUnixSeconds",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        },
+        {
+          "name": "panCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "aadhaarCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "ageCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "residencyCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "identityPanCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "identityAadhaarCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Tuple",
+        "types": [
+        ]
+      }
+    },
+    {
+      "name": "expireIfDue",
+      "pure": false,
+      "proof": true,
+      "arguments": [
+        {
+          "name": "requestId",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "nowUnixSeconds",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Enum",
+        "name": "RequestStatus",
+        "elements": [
+          "PENDING",
+          "APPROVED",
+          "REJECTED",
+          "COMPLETED",
+          "EXPIRED",
+          "CANCELLED"
+        ]
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "name": "requesterSecret",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "requesterSalt",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "dobUnixSeconds",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Uint",
+        "maxval": 18446744073709551615
+      }
+    },
+    {
+      "name": "commitmentSalt",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "panRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 16
+      }
+    },
+    {
+      "name": "aadhaarRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 16
+      }
+    },
+    {
+      "name": "addressRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 128
+      }
+    }
+  ],
+  "contracts": [
+  ],
+  "ledger": [
+    {
+      "name": "requests",
+      "index": 0,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Struct",
+        "name": "RequestRecord",
+        "elements": [
+          {
+            "name": "requester",
+            "type": {
+              "type-name": "Bytes",
+              "length": 32
+            }
+          },
+          {
+            "name": "panRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "aadhaarRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "ageRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "residencyRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "identityRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "createdAt",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "expiresAt",
+            "type": {
+              "type-name": "Uint",
+              "maxval": 18446744073709551615
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "type-name": "Enum",
+              "name": "RequestStatus",
+              "elements": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "COMPLETED",
+                "EXPIRED",
+                "CANCELLED"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "results",
+      "index": 1,
+      "exported": true,
+      "storage": "Map",
+      "key": {
+        "type-name": "Bytes",
+        "length": 32
+      },
+      "value": {
+        "type-name": "Struct",
+        "name": "ClaimResults",
+        "elements": [
+          {
+            "name": "panRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "panValid",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "aadhaarRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "aadhaarVerified",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "ageRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "ageOver18",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "residencyRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "residencyValid",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "identityRequested",
+            "type": {
+              "type-name": "Boolean"
+            }
+          },
+          {
+            "name": "identityVerified",
+            "type": {
+              "type-name": "Boolean"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

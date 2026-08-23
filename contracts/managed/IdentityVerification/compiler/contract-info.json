@@ -1,0 +1,157 @@
+{
+  "compiler-version": "0.31.1",
+  "language-version": "0.23.0",
+  "runtime-version": "0.16.0",
+  "circuits": [
+    {
+      "name": "proveAgeOver18",
+      "pure": false,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "credentialCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "nowUnixSeconds",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "provePanValid",
+      "pure": false,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "credentialCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "proveAadhaarVerified",
+      "pure": false,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "credentialCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "proveResidencyValid",
+      "pure": false,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "credentialCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    },
+    {
+      "name": "proveIdentityVerified",
+      "pure": false,
+      "proof": false,
+      "arguments": [
+        {
+          "name": "panCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        },
+        {
+          "name": "aadhaarCommitment",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
+      ],
+      "result-type": {
+        "type-name": "Boolean"
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "name": "dobUnixSeconds",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Uint",
+        "maxval": 18446744073709551615
+      }
+    },
+    {
+      "name": "commitmentSalt",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 32
+      }
+    },
+    {
+      "name": "panRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 16
+      }
+    },
+    {
+      "name": "aadhaarRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 16
+      }
+    },
+    {
+      "name": "addressRaw",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Bytes",
+        "length": 128
+      }
+    }
+  ],
+  "contracts": [
+  ],
+  "ledger": [
+  ]
+}

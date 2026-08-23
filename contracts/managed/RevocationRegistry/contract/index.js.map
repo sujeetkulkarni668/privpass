@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../",
+  "sources": ["src/RevocationRegistry.compact", "compiler/standard-library.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAuBA;;;;;;;;;;;;;;;;MAgBA,AAAA,eAEC;;;;;cAF8B,gBAAyB;;;;;;;;;;;;;;;;;;yCAAzB,gBAAyB;;;;;;;;;iDAAzB,gBAAyB;;;OAEvD;MAED,AAAA,gBAkBC;;;;;cAjBC,YAAqB;cACrB,WAAmB;cACnB,YAAmB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;yCAFnB,YAAqB,+BACrB,WAAmB,+BACnB,YAAmB;;;;;;;;;kDAFnB,YAAqB;kDACrB,WAAmB;kDACnB,YAAmB;;;OAepB;MAED,AAAA,SAGC;;;;;cAHwB,YAAqB;;;;;;;;;;;;;;;;;;yCAArB,YAAqB;;;;;;;;;2CAArB,YAAqB;;;OAG7C;;;;;;;;;;;;GACA;EA5CD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAaA;;;;;;;;;;yEAAuD;IACvD;;;;;;;;;;yEAAyD;;;;;;;GA8BxD;ECnED,AAAA,kBAAA;oEAAA;;;ED2BA,AAAA,eAAkC;;0DAAlC,YAAkC;;;;;;;;;;;;;;GAAA;EAClC,AAAA,aAAgC;;0DAAhC,UAAgC;;;;;;;;;;;;;;GAAA;EAWhC,AAAA,kBAEC,4BAF8B,gBAAyB;IACtD;;;;;;;;;;2HAAkC,gBAAc;;;;;;wEAA/B;;GAClB;EAED,AAAA,mBAkBC;;sBAjBC,YAAqB;sBACrB,WAAmB;sBACnB,YAAmB;;UAEb,gBAAqC,GAAX,YAAU;qDAClC;;;;;;;;;;;4KAAe,gBAAc;;;;0HAAtB;;4BACR,YAAU;UAEX,UAAiF;;;;UACjF,cAAiC,GAAT,UAAQ;oDAC/B;;;;;;;;;;;2KAAyB,cAAY;;;;yHAApB;;oDAAyB;;;;;;;;;;;;;;+IAAyB,cAAY;;;yHAApB;;UAElE,KAAO,gBACe,WAAS;gCACR,YAAU;+BACpB,cAAY;IAHzB;;;;;;;;;;2HAAe,gBAAc;;;2HAA7B,KAAO;;;wEAAA;;GAKR;EAED,AAAA,YAGC,4BAHwB,YAAqB;UACtC,gBAAqC,GAAX,YAAU;mCAC1B;;;;;;;;;;;0JAAe,gBAAc;;;;wGAAtB;GACxB;;;;;;;;;;;;;;;;IA9BD;;;;;uCAAA;;;;;;;;;;;;;;;;4GAAuD;;;;;;uCAAvD;;;;;;;;;;;;4GAAuD;;;;;;;;;;;;;;uCAAvD;;;;;;;;;;;;;;;4GAAuD;;;;;;;;;;;;;;uCAAvD;;;;;;;;;;;;;;;;;4GAAuD;;;;;;;;;KAAA;IACvD;;;;;uCAAA;;;;;;;;;;;;;;;;4GAAyD;;;;;;uCAAzD;;;;;;;;;;;;4GAAyD;;;;;;;;;;;;;;uCAAzD;;;;;;;;;;;;;;;4GAAyD;;;;;;;;;;;;;;uCAAzD;;;;;;;;;;;;;;;;;4GAAyD;;;;;;;;;KAAA;;;;;;;;;;;;"
+}
