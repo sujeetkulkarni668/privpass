@@ -54,6 +54,21 @@ export const api = {
 
   listCredentials: () => request<{ credentials: any[] }>("/credentials"),
 
+  listCredentialHistory: () => request<{ credentials: any[] }>("/credentials/history"),
+
+  listVerificationHistory: () =>
+    request<{
+      verifications: {
+        id: string;
+        organizationName: string;
+        claims: string[];
+        result: string;
+        verifiedAt: string;
+        claimResults: Record<string, boolean> | null;
+        proofValid: boolean;
+      }[];
+    }>("/verifications"),
+
   issueCredential: (type: string) =>
     request("/credentials/issue", { method: "POST", body: JSON.stringify({ type }) }),
 

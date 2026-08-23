@@ -26,6 +26,25 @@ credentialsRouter.post("/issue", requireUser, async (req: AuthedRequest, res) =>
   const parsed = schema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "invalid_input" });
 
+  // Enforce limit: maximum 1 active credential per type per user account
+  const existingActive = await prisma.credential.findFirst({
+    where: {
+      userId: req.userId!,
+      type: parsed.data.type,
+      status: "ACTIVE",
+      OR: [
+        { expiresAt: null },
+        { expiresAt: { gt: new Date() } },
+      ],
+    },
+  });
+  if (existingActive) {
+    return res.status(409).json({
+      error: "credential_already_exists",
+      message: `You already have an active ${parsed.data.type} credential in this account. Only 1 credential per type is allowed. Revoke the existing credential before issuing a new one.`,
+    });
+  }
+
   const provider = getConfiguredProvider();
   const attrs = await provider.fetchAttributes(req.userId!);
 
@@ -106,6 +125,17 @@ credentialsRouter.post("/issue", requireUser, async (req: AuthedRequest, res) =>
 credentialsRouter.get("/", requireUser, async (req: AuthedRequest, res) => {
   const credentials = await prisma.credential.findMany({
     where: { userId: req.userId },
+    orderBy: { createdAt: "desc" },
+  });
+  return res.json({ credentials });
+});
+
+credentialsRouter.get("/history", requireUser, async (req: AuthedRequest, res) => {
+  const credentials = await prisma.credential.findMany({
+    where: { userId: req.userId },
+    include: {
+      statusHistory: { orderBy: { createdAt: "desc" } },
+    },
     orderBy: { createdAt: "desc" },
   });
   return res.json({ credentials });

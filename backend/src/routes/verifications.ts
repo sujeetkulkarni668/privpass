@@ -132,6 +132,31 @@ verificationsRouter.post("/:requestId/prove", requireUser, async (req: AuthedReq
   return res.json({ status: resultStatus, claimResults, proofValid });
 });
 
+// User-facing verification history for the authenticated user
+verificationsRouter.get("/", requireUser, async (req: AuthedRequest, res) => {
+  const requests = await prisma.verificationRequest.findMany({
+    where: { subjectUserId: req.userId },
+    include: {
+      organization: { select: { name: true } },
+      result: true,
+      consent: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return res.json({
+    verifications: requests.map((r) => ({
+      id: r.id,
+      organizationName: r.organization.name,
+      claims: (r.consent?.disclosedClaims as string[]) || r.requestedClaims,
+      result: r.result?.status || r.status,
+      verifiedAt: r.result?.verifiedAt || r.updatedAt,
+      claimResults: r.result?.claimResults || null,
+      proofValid: r.result?.proofValid || false,
+    })),
+  });
+});
+
 // Verifier-facing read of the result. Requires proof of membership in the
 // owning organization — either an API key scoped to it, or a dashboard
 // session for a user with a role in it. This used to be fully
