@@ -1,4 +1,8 @@
-const BASE = "/api"; // proxied to backend in dev; same-origin behind a reverse proxy in prod
+/// <reference types="vite/client" />
+
+const BASE = (import.meta as any).env?.VITE_API_URL
+  ? String((import.meta as any).env.VITE_API_URL).replace(/\/$/, "")
+  : "/api";
 
 let accessToken: string | null = null;
 export function setAccessToken(token: string | null) {
