@@ -1,0 +1,19 @@
+{
+  "name": "@privpass/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "wsl -d Ubuntu bash -i -c 'export PATH=\"$HOME/.local/bin:$PATH\" && cd /mnt/c/Users/Sujeet\\ Kulkarni/Desktop/Privpass/privpass/contracts && compact compile src/CredentialRegistry.compact managed/CredentialRegistry && compact compile src/IdentityVerification.compact managed/IdentityVerification && compact compile src/RevocationRegistry.compact managed/RevocationRegistry && compact compile src/VerificationRequest.compact managed/VerificationRequest'",
+    "compile:ci": "CONTRACTS_SKIP_ZK=1 bash scripts/compile.sh",
+    "verify-artifacts": "bash scripts/verify-artifacts.sh",
+    "test": "vitest run test/",
+    "build": "echo Contracts build ready",
+    "deploy": "tsx scripts/deploy.ts"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "^0.16.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.1"
+  }
+}
