@@ -1,0 +1,344 @@
+/* PrivPass design tokens
+   ----------------------------------------------------------------
+   Palette:
+     --ink:        #0B1220  page ground, deep slate-navy (not pure black)
+     --ink-raised: #121B2E  cards / raised surfaces
+     --ink-line:   #223050  hairline borders
+     --paper:      #EDEFF5  primary text
+     --slate:      #8493B0  secondary text
+     --signal:     #3ECF8E  "will be disclosed" / verified / active
+     --withhold:   #E8A33D  "will NOT be disclosed" / pending
+     --danger:     #E8615D  revoked / failed
+
+   Type:
+     display  Fraunces   — headlines only, used with restraint
+     body     Inter      — UI text
+     data     IBM Plex Mono — claims, commitments, hashes, statuses
+   ---------------------------------------------------------------- */
+
+:root {
+  --ink: #0b1220;
+  --ink-raised: #121b2e;
+  --ink-raised-2: #17223a;
+  --ink-line: #223050;
+  --paper: #edeff5;
+  --slate: #8493b0;
+  --slate-dim: #5c6b8a;
+  --signal: #3ecf8e;
+  --signal-dim: #1f4d3d;
+  --withhold: #e8a33d;
+  --withhold-dim: #4d3c1f;
+  --danger: #e8615d;
+  --danger-dim: #4d2422;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 400;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+p {
+  margin: 0 0 1em;
+  color: var(--slate);
+}
+
+a {
+  color: inherit;
+}
+
+code,
+.mono {
+  font-family: var(--font-data);
+  font-size: 0.9em;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate-dim);
+}
+
+.card {
+  background: var(--ink-raised);
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--signal);
+  color: #06231a;
+}
+
+.btn-primary:hover {
+  background: #4fe0a0;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--ink-line);
+  color: var(--paper);
+}
+
+.btn-secondary:hover {
+  border-color: var(--slate-dim);
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input:not([type]),
+textarea {
+  background: var(--ink);
+  border: 1px solid var(--ink-line);
+  color: var(--paper);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+input:focus {
+  border-color: var(--signal);
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--slate);
+  margin-bottom: 6px;
+}
+
+/* --- The Disclosure Manifest: the app's signature UI element ---
+   A customs-declaration-style ledger of exactly what a verifier will
+   and will not receive. Used on the verification-request builder AND
+   the user's consent screen, so the same visual promise appears on
+   both sides of the transaction. */
+.manifest {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.manifest-col {
+  padding: 20px;
+}
+
+.manifest-col + .manifest-col {
+  border-left: 1px solid var(--ink-line);
+}
+
+.manifest-col.receive {
+  background: linear-gradient(180deg, var(--signal-dim), transparent 60%);
+}
+
+.manifest-col.withhold {
+  background: linear-gradient(180deg, var(--withhold-dim), transparent 60%);
+}
+
+.manifest-heading {
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.manifest-col.receive .manifest-heading {
+  color: var(--signal);
+}
+
+.manifest-col.withhold .manifest-heading {
+  color: var(--withhold);
+}
+
+.manifest-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-data);
+  font-size: 0.9rem;
+  padding: 6px 0;
+}
+
+.manifest-item .mark {
+  width: 1em;
+  flex-shrink: 0;
+}
+
+.manifest-col.receive .mark {
+  color: var(--signal);
+}
+
+.manifest-col.withhold .mark {
+  color: var(--withhold);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-line);
+}
+
+.badge-active {
+  color: var(--signal);
+  border-color: var(--signal-dim);
+  background: var(--signal-dim);
+}
+
+.badge-pending {
+  color: var(--withhold);
+  border-color: var(--withhold-dim);
+  background: var(--withhold-dim);
+}
+
+.badge-revoked {
+  color: var(--danger);
+  border-color: var(--danger-dim);
+  background: var(--danger-dim);
+}
+
+.demo-watermark {
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--withhold);
+  border: 1px dashed var(--withhold-dim);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+nav.topbar {
+  border-bottom: 1px solid var(--ink-line);
+  position: sticky;
+  top: 0;
+  background: rgba(11, 18, 32, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+nav.topbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+nav.topbar a {
+  text-decoration: none;
+  color: var(--slate);
+  font-size: 0.9rem;
+}
+
+nav.topbar a.active,
+nav.topbar a:hover {
+  color: var(--paper);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--paper) !important;
+}
