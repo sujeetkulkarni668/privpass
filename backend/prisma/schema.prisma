@@ -1,0 +1,312 @@
+// PrivPass database schema.
+//
+// PRIVACY INVARIANT: This schema must never gain a column that stores a raw
+// Aadhaar number, raw PAN number, exact date of birth, full address, or
+// identity document image/bytes. Only commitments (hashes), boolean claim
+// results, and non-sensitive metadata are persisted. See docs/privacy.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  DEVELOPER
+  ANALYST
+  VIEWER
+}
+
+enum CredentialType {
+  PAN
+  AADHAAR
+  AGE
+  RESIDENCY
+  IDENTITY_COMPOSITE
+}
+
+enum CredentialStatus {
+  ISSUED
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum ClaimType {
+  PAN_VALID
+  AADHAAR_VERIFIED
+  AGE_OVER_18
+  IDENTITY_VERIFIED
+  RESIDENCY_VALID
+}
+
+enum VerificationRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum VerificationResultStatus {
+  VERIFIED
+  FAILED
+  EXPIRED
+}
+
+enum WebhookEventType {
+  VERIFICATION_CREATED
+  VERIFICATION_PENDING
+  VERIFICATION_VERIFIED
+  VERIFICATION_FAILED
+  VERIFICATION_EXPIRED
+  CREDENTIAL_REVOKED
+  CREDENTIAL_EXPIRED
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  RETRYING
+}
+
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String
+  emailVerifiedAt   DateTime?
+  mfaEnabled        Boolean   @default(false)
+  mfaSecretEnc      String?   // encrypted at rest, never logged
+  displayName       String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  memberships       OrganizationMember[]
+  credentials       Credential[]
+  consents          Consent[]
+  sessions          Session[]
+  notifications     Notification[]
+  auditLogsActor    AuditLog[]           @relation("AuditLogActor")
+
+  @@map("users")
+}
+
+model Organization {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  members            OrganizationMember[]
+  verificationRequests VerificationRequest[]
+  apiKeys            ApiKey[]
+  webhooks           Webhook[]
+  auditLogs          AuditLog[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrgRole  @default(VIEWER)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+// A Credential row NEVER stores the raw PAN/Aadhaar/DOB. `commitment` is a
+// Poseidon/Pedersen-style hash commitment produced client-side (or by the
+// identity provider adapter) over the private value + a random salt held
+// only by the user's wallet. See docs/privacy.md §Commitments.
+model Credential {
+  id              String            @id @default(uuid())
+  userId          String
+  type            CredentialType
+  issuer          String            // e.g. "SyntheticIdentityProvider", "UIDAI-Adapter (future)"
+  commitment      String            // hex-encoded commitment, public-safe
+  status          CredentialStatus  @default(ISSUED)
+  issuedAt        DateTime          @default(now())
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  revocationReason String?
+  onChainRef      String?           // Compact ledger reference / tx id once anchored
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statusHistory   CredentialStatusEvent[]
+
+  @@index([userId])
+  @@map("credentials")
+}
+
+model CredentialStatusEvent {
+  id           String           @id @default(uuid())
+  credentialId String
+  fromStatus   CredentialStatus?
+  toStatus     CredentialStatus
+  reason       String?
+  createdAt    DateTime         @default(now())
+
+  credential   Credential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@map("credential_status_events")
+}
+
+model VerificationRequest {
+  id              String                     @id @default(uuid())
+  organizationId  String
+  createdByUserId String?
+  requestedClaims ClaimType[]
+  optionalClaims  ClaimType[]
+  status          VerificationRequestStatus  @default(PENDING)
+  subjectUserId   String?                    // set once a user opens/claims the request
+  qrPayloadHash   String?                    // hash of QR payload, not the payload itself if sensitive
+  expiresAt       DateTime
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  consent         Consent?
+  result          VerificationResult?
+
+  @@index([organizationId, status])
+  @@map("verification_requests")
+}
+
+model Consent {
+  id                     String   @id @default(uuid())
+  verificationRequestId  String   @unique
+  userId                 String
+  disclosedClaims        ClaimType[]
+  approvedAt             DateTime @default(now())
+
+  verificationRequest VerificationRequest @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("consents")
+}
+
+// Only the boolean claim RESULTS are stored — never the private inputs that
+// produced them.
+model VerificationResult {
+  id                     String   @id @default(uuid())
+  verificationRequestId  String   @unique
+  status                 VerificationResultStatus
+  claimResults           Json     // { "PAN_VALID": true, "AGE_OVER_18": true }
+  proofValid             Boolean
+  proofRef               String?  // reference to the ZK proof artifact / tx hash on Midnight
+  verifiedAt             DateTime @default(now())
+
+  verificationRequest VerificationRequest @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
+
+  @@map("verification_results")
+}
+
+model ApiKey {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  keyPrefix      String   // first 8 chars shown in UI, e.g. "pp_live_"
+  keyHash        String   // argon2 hash of the full key — never store plaintext
+  scopes         String[]
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+model Webhook {
+  id             String    @id @default(uuid())
+  organizationId String
+  url            String
+  secretEnc      String    // encrypted signing secret
+  eventTypes     WebhookEventType[]
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
+  @@map("webhooks")
+}
+
+model WebhookDelivery {
+  id           String                 @id @default(uuid())
+  webhookId    String
+  eventType    WebhookEventType
+  payload      Json
+  status       WebhookDeliveryStatus  @default(PENDING)
+  attempts     Int                    @default(0)
+  lastAttemptAt DateTime?
+  responseCode Int?
+  createdAt    DateTime               @default(now())
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_deliveries")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  organizationId String?
+  actorUserId    String?
+  action         String   // e.g. "credential.revoked", "verification.created"
+  targetType     String?
+  targetId       String?
+  metadata       Json?    // non-sensitive metadata only — never identity data
+  ipAddress      String?
+  createdAt      DateTime @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor        User?         @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@map("audit_logs")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  refreshTokenHash String
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  revokedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
