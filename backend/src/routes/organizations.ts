@@ -28,6 +28,22 @@ organizationsRouter.post("/", requireUser, async (req: AuthedRequest, res) => {
   return res.status(201).json({ organization: org });
 });
 
+organizationsRouter.get("/", requireUser, async (req: AuthedRequest, res) => {
+  const memberships = await prisma.organizationMember.findMany({
+    where: { userId: req.userId },
+    include: { organization: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return res.json({
+    organizations: memberships.map((m) => ({
+      id: m.organization.id,
+      name: m.organization.name,
+      slug: m.organization.slug,
+      role: m.role,
+    })),
+  });
+});
+
 organizationsRouter.get("/:orgId", requireOrgRole("VIEWER"), async (req: AuthedRequest, res) => {
   const org = await prisma.organization.findUnique({ where: { id: req.orgId } });
   return res.json({ organization: org });

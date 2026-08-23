@@ -50,9 +50,11 @@ export const api = {
       { method: "POST", body: JSON.stringify(data) }
     ),
 
-  logout: () => request("/auth/logout", { method: "POST" }),
-
   listCredentials: () => request<{ credentials: any[] }>("/credentials"),
+
+  listOrganizations: () => request<{ organizations: { id: string; name: string; slug: string; role: string }[] }>("/organizations"),
+
+  createOrganization: (name: string) => request<{ organization: any }>("/organizations", { method: "POST", body: JSON.stringify({ name }) }),
 
   listCredentialHistory: () => request<{ credentials: any[] }>("/credentials/history"),
 
