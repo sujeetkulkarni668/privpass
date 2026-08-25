@@ -2,7 +2,7 @@
 
 **Verify Identity. Reveal Nothing Unnecessary.**
 
-[![CI](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml/badge.svg)](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml)
+[![CI](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-blue.svg)](https://midnight.network)
 [![Smart Contracts: Compact 0.5.2](https://img.shields.io/badge/Compact-0.5.2-purple.svg)](https://docs.midnight.network)
 [![Wallet: 1AM + Lace](https://img.shields.io/badge/Wallet-1AM%20%2B%20Lace-green.svg)](https://midnight.network)
