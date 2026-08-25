@@ -52,7 +52,7 @@ jobs:
         continue-on-error: true
 
       - name: Run database migrations
-        run: yarn workspace @privpass/backend db:migrate:deploy
+        run: yarn workspace @privpass/backend db:migrate
         env:
           DATABASE_URL: postgresql://privpass:privpass@localhost:5432/privpass_test
 
