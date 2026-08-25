@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
@@ -40,9 +40,11 @@
     "pino-http": "^10.3.0",
     "qrcode": "^1.5.4",
     "svix": "^1.41.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
@@ -50,11 +52,13 @@
     "@types/node": "^20.16.5",
     "@types/qrcode": "^1.5.5",
     "@types/supertest": "^6.0.2",
+    "@typescript-eslint/parser": "^8.68.0",
     "eslint": "^9.10.0",
     "prisma": "5.22.0",
     "supertest": "^7.0.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^2.1.1"
   }
 }

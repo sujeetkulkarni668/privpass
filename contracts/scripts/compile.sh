@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Compiles every .compact source in src/ into managed/ using the official
-# Compact compiler (`compactc`), then writes contract artifacts + their
+# Compact compiler (`compact compile`), then writes contract artifacts + their
 # keccak/blake digests for the deployment manifest.
 #
-# This script does NOT fabricate output. If `compactc` is not on PATH it
+# This script does NOT fabricate output. If `compact` is not on PATH it
 # fails loudly and tells you how to install it, rather than faking a
 # managed/ directory.
 set -euo pipefail
@@ -12,8 +12,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC_DIR="$ROOT_DIR/src"
 OUT_DIR="$ROOT_DIR/managed"
 
-# The Midnight toolchain is distributed as the `compact` CLI (which itself
-# manages/wraps the installed compactc version), via the official installer:
+# The Midnight toolchain is distributed as the `compact` CLI, via the official
+# installer:
 #   curl --proto '=https' --tlsv1.2 -LsSf \
 #     https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
 # It is NOT an npm/pip package, so it can't be added to package.json.
@@ -30,7 +30,8 @@ if ! command -v compact >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Using $(compact compile --version 2>&1 | head -n1)"
+# Print toolchain version (compact --version, not compact compile --version)
+echo "Compact toolchain: $(compact --version 2>&1 | head -n1)"
 
 # CONTRACTS_SKIP_ZK=1 skips proving/verifier-key generation (fast syntax +
 # type-check pass only — no valid proofs can be produced from that output).

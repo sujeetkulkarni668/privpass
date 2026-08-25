@@ -9,31 +9,44 @@ export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+// Wallet address is set by the wallet connection module (wallet.ts).
+// It is included in issuance requests as the X-Wallet-Address header.
+// The backend validates its presence before allowing document issuance.
+let connectedWalletAddress: string | null = null;
+export function setConnectedWalletAddress(address: string | null) {
+  connectedWalletAddress = address;
+}
+export function getConnectedWalletAddress(): string | null {
+  return connectedWalletAddress;
+}
+
+async function request<T>(path: string, init: RequestInit = {}, extraHeaders?: Record<string, string>): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(init.headers as Record<string, string> | undefined),
+    ...extraHeaders,
   };
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  // Include wallet address in every request if available — the backend
+  // ignores it on endpoints that don't need it, and enforces it on /issue.
+  if (connectedWalletAddress) headers["X-Wallet-Address"] = connectedWalletAddress;
 
   const res = await fetch(`${BASE}${path}`, { ...init, headers, credentials: "include" });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     // Surface the backend's error code AND any zod validation details, so
     // callers can show the real reason instead of guessing from the
-    // string alone. Previously only `error` was available, which led
-    // Register.tsx to collapse every non-"account_exists" failure
-    // (rate limits, network errors, validation on other fields, server
-    // errors) into a misleading "password too short" message even when
-    // the password was perfectly valid.
+    // string alone.
     const apiError = new Error(body.error ?? `request_failed_${res.status}`) as Error & {
       code?: string;
       details?: unknown;
       status?: number;
+      message_detail?: string;
     };
     apiError.code = body.error ?? `request_failed_${res.status}`;
     apiError.details = body.details;
     apiError.status = res.status;
+    apiError.message_detail = body.message;
     throw apiError;
   }
   if (res.status === 204) return undefined as T;
@@ -41,11 +54,11 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  register: (data: { email: string; password: string; displayName: string }) =>
+  register: (data: { username: string; password: string; displayName: string }) =>
     request("/auth/register", { method: "POST", body: JSON.stringify(data) }),
 
-  login: (data: { email: string; password: string }) =>
-    request<{ accessToken: string; user: { id: string; email: string; displayName: string } }>(
+  login: (data: { username: string; password: string }) =>
+    request<{ accessToken: string; user: { id: string; username: string; displayName: string } }>(
       "/auth/login",
       { method: "POST", body: JSON.stringify(data) }
     ),
@@ -71,11 +84,21 @@ export const api = {
       }[];
     }>("/verifications"),
 
+  // Credential issuance requires a connected wallet (X-Wallet-Address header).
+  // The header is automatically included by the request() helper above when
+  // connectedWalletAddress is set. The backend enforces wallet presence
+  // independently of this frontend behaviour.
   issueCredential: (type: string) =>
     request("/credentials/issue", { method: "POST", body: JSON.stringify({ type }) }),
 
   revokeCredential: (id: string, reason?: string) =>
     request(`/credentials/${id}/revoke`, { method: "POST", body: JSON.stringify({ reason }) }),
+
+  // Links the connected wallet address to the logged-in user account.
+  // Called after a successful wallet connection so the backend can store
+  // the wallet address for auditing and session continuity.
+  linkWallet: (walletAddress: string) =>
+    request("/auth/wallet", { method: "PUT", body: JSON.stringify({ walletAddress }) }),
 
   getVerificationRequest: (id: string) =>
     request<{

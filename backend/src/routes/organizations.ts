@@ -52,7 +52,7 @@ organizationsRouter.get("/:orgId", requireOrgRole("VIEWER"), async (req: AuthedR
 organizationsRouter.get("/:orgId/members", requireOrgRole("ANALYST"), async (req: AuthedRequest, res) => {
   const members = await prisma.organizationMember.findMany({
     where: { organizationId: req.orgId },
-    include: { user: { select: { id: true, email: true, displayName: true } } },
+    include: { user: { select: { id: true, username: true, displayName: true } } },
   });
   return res.json({ members });
 });

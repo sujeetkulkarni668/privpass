@@ -7,7 +7,9 @@ on:
     branches: [main]
 
 jobs:
+  # ── Backend ───────────────────────────────────────────────────────────────
   backend:
+    name: "CL back end push"
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,62 +26,104 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
-      - run: corepack enable
-      - run: yarn install --immutable
-      - run: yarn workspace @privpass/backend db:generate
-      - run: yarn workspace @privpass/backend typecheck
-      - run: yarn workspace @privpass/backend lint
-      - name: Run migrations
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Generate Prisma client
+        run: yarn workspace @privpass/backend db:generate
+
+      - name: TypeScript type-check
+        run: yarn workspace @privpass/backend typecheck
+
+      - name: Lint
+        run: yarn workspace @privpass/backend lint
+
+      - name: Run database migrations
         run: yarn workspace @privpass/backend db:migrate
         env:
           DATABASE_URL: postgresql://privpass:privpass@localhost:5432/privpass_test
+
       - name: Run tests
         run: yarn workspace @privpass/backend test
         env:
           DATABASE_URL: postgresql://privpass:privpass@localhost:5432/privpass_test
           JWT_ACCESS_SECRET: ci-test-secret
-      - run: yarn workspace @privpass/backend build
 
+      - name: Build
+        run: yarn workspace @privpass/backend build
+
+  # ── Frontend ──────────────────────────────────────────────────────────────
   frontend:
+    name: "CL front end push"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: corepack enable
-      - run: yarn install --immutable
-      - run: yarn workspace @privpass/frontend typecheck
-      - run: yarn workspace @privpass/frontend lint
-      - run: yarn workspace @privpass/frontend build
 
-  contracts:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
-      - run: corepack enable
-      - run: yarn install --immutable
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: TypeScript type-check
+        run: yarn workspace @privpass/frontend typecheck
+
+      - name: Lint
+        run: yarn workspace @privpass/frontend lint
+
+      - name: Build
+        run: yarn workspace @privpass/frontend build
+
+  # ── Contracts ─────────────────────────────────────────────────────────────
+  contracts:
+    name: "CL contracts push"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
       - name: Install Compact toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf \
             https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Compact toolchain is available
+        run: compact --version
+
       - name: Compile Compact contracts
-        # CONTRACTS_SKIP_ZK skips proving-key generation for fast PR feedback
+        # CONTRACTS_SKIP_ZK=1 skips proving-key generation for fast PR feedback
         # (syntax/type-check only). The release/deploy workflow must run a
         # full (non-skip-zk) compile before any Preprod deployment — see
         # docs/deployment.md.
         run: yarn workspace @privpass/contracts compile:ci
+
       - name: Verify managed artifacts were produced
         run: yarn workspace @privpass/contracts verify-artifacts
+
       - name: Run contract tests
         run: yarn workspace @privpass/contracts test

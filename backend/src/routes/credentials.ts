@@ -13,12 +13,52 @@ function hexToBytes(hex: string): Uint8Array {
   return out;
 }
 
+/**
+ * Extracts and validates the wallet address from the request.
+ * The wallet address is passed by the frontend in the X-Wallet-Address header
+ * once the user has connected a Lace or 1AM Midnight wallet.
+ *
+ * This is a server-side check independent of any frontend state. It cannot be
+ * bypassed by UI manipulation — the header must be present on every issuance
+ * request.
+ *
+ * Returns the wallet address string if present and valid, or null if missing/invalid.
+ */
+function extractWalletAddress(req: AuthedRequest): string | null {
+  const raw = req.headers["x-wallet-address"];
+  if (!raw || typeof raw !== "string" || raw.trim().length === 0) return null;
+  const addr = raw.trim();
+  // Minimal format check: Midnight wallet addresses are non-trivially long hex/bech32 strings.
+  // Reject obviously fake values (too short, or equals literal "undefined"/"null").
+  if (addr.length < 10 || addr === "undefined" || addr === "null") return null;
+  return addr;
+}
+
 export const credentialsRouter = Router();
 
-// Issue a new (synthetic, in this build) credential for the logged-in
-// user. Only the commitment is persisted; the salt is returned once to
-// the caller for wallet-side storage and is never saved server-side.
+// Issue a new (synthetic, in this build) credential for the logged-in user.
+//
+// WALLET REQUIREMENT: A connected Midnight wallet (Lace or 1AM) is required
+// to issue government documents. This is checked server-side via the
+// X-Wallet-Address header, which the frontend sets only when a wallet is
+// connected. No wallet address = 403 Forbidden, regardless of login status.
+//
+// Only the commitment is persisted; the salt is returned once to the caller
+// for wallet-side storage and is never saved server-side.
 credentialsRouter.post("/issue", requireUser, async (req: AuthedRequest, res) => {
+  // ── Wallet gate ──────────────────────────────────────────────────────────
+  // This check is independent of frontend state and cannot be bypassed.
+  const walletAddress = extractWalletAddress(req);
+  if (!walletAddress) {
+    return res.status(403).json({
+      error: "wallet_required",
+      message:
+        "A connected Lace or 1AM Midnight wallet is required to issue government documents. " +
+        "Connect your wallet in the app and try again.",
+    });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const schema = z.object({
     type: z.enum(["PAN", "AADHAAR", "AGE", "RESIDENCY", "IDENTITY_COMPOSITE"]),
     expiresInDays: z.number().int().positive().max(3650).default(365),
@@ -101,7 +141,11 @@ credentialsRouter.post("/issue", requireUser, async (req: AuthedRequest, res) =>
     action: "credential.issued",
     targetType: "credential",
     targetId: credential.id,
-    metadata: { type: parsed.data.type, synthetic: provider.isSynthetic },
+    metadata: {
+      type: parsed.data.type,
+      synthetic: provider.isSynthetic,
+      walletAddress, // audit which wallet address was connected at time of issuance
+    },
   });
 
   // `salt` is returned ONCE for the client-side wallet to store (e.g. in

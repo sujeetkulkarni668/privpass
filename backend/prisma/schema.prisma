@@ -79,12 +79,12 @@ enum WebhookDeliveryStatus {
 
 model User {
   id                String    @id @default(uuid())
-  email             String    @unique
+  username          String    @unique  // login identifier — replaces email
   passwordHash      String
-  emailVerifiedAt   DateTime?
   mfaEnabled        Boolean   @default(false)
   mfaSecretEnc      String?   // encrypted at rest, never logged
   displayName       String
+  walletAddress     String?   // optional Midnight wallet address, set when user connects a wallet
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

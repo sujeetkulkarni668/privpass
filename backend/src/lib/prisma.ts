@@ -2,7 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 // Single shared Prisma client. In dev, reuse across hot reloads.
 declare global {
-  // eslint-disable-next-line no-var
   var __privpassPrisma: PrismaClient | undefined;
 }
 

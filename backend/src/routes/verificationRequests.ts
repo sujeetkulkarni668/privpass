@@ -1,10 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import { nanoid } from "nanoid";
 import { createHash } from "node:crypto";
 import QRCode from "qrcode";
 import { prisma } from "../lib/prisma.js";
-import { requireUser, requireOrgRole, requireApiKey, type AuthedRequest } from "../middleware/auth.js";
+import { requireOrgRole, type AuthedRequest } from "../middleware/auth.js";
 import { writeAuditLog } from "../services/auditService.js";
 import { dispatchWebhookEvent } from "../services/webhookService.js";
 

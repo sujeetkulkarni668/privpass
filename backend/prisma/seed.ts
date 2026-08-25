@@ -6,13 +6,12 @@ const prisma = new PrismaClient();
 
 async function main() {
   const demoUser = await prisma.user.upsert({
-    where: { email: "demo.user@example.com" },
+    where: { username: "demo.user" },
     update: {},
     create: {
-      email: "demo.user@example.com",
+      username: "demo.user",
       passwordHash: await argon2.hash("ChangeMe!12345", { type: argon2.argon2id }),
       displayName: "Demo User",
-      emailVerifiedAt: new Date(),
     },
   });
 
@@ -45,7 +44,7 @@ async function main() {
     },
   });
 
-  console.log("Seeded:", { demoUser: demoUser.email, org: org.slug });
+  console.log("Seeded:", { demoUser: demoUser.username, org: org.slug });
   console.log("DEMO CREDENTIAL — NOT A REAL GOVERNMENT ID. Wallet salt (dev only):", salt);
 }
 

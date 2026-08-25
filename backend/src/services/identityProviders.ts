@@ -45,7 +45,7 @@ export class SyntheticIdentityProvider implements IdentityProvider {
   readonly name = "SyntheticIdentityProvider";
   readonly isSynthetic = true;
 
-  async fetchAttributes(subjectRef: string): Promise<RawIdentityAttributes> {
+  async fetchAttributes(_subjectRef: string): Promise<RawIdentityAttributes> {
     // Deterministic demo record, clearly watermarked. Never used to imply
     // real government data access.
     return {

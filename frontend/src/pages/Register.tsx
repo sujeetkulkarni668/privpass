@@ -6,12 +6,12 @@ function describeAuthError(err: unknown): string {
   const anyErr = err as { code?: string; details?: any; message?: string } | undefined;
   const code = anyErr?.code ?? anyErr?.message;
 
-  if (code === "account_exists") return "An account with this email already exists.";
+  if (code === "account_exists") return "An account with this username already exists.";
   if (code === "too_many_attempts") return "Too many attempts. Please wait a few minutes and try again.";
   if (code === "invalid_input") {
     const fieldErrors = anyErr?.details?.fieldErrors ?? {};
     if (fieldErrors.password?.length) return fieldErrors.password[0];
-    if (fieldErrors.email?.length) return fieldErrors.email[0];
+    if (fieldErrors.username?.length) return fieldErrors.username[0];
     if (fieldErrors.displayName?.length) return fieldErrors.displayName[0];
     return "Please check the form — one of the fields isn't valid.";
   }
@@ -23,7 +23,7 @@ function describeAuthError(err: unknown): string {
 
 export default function Register() {
   const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,9 +34,9 @@ export default function Register() {
     setError(null);
     setLoading(true);
     try {
-      await api.register({ displayName, email, password });
+      await api.register({ displayName, username, password });
       // Automatically log the user in upon successful registration
-      const { accessToken } = await api.login({ email, password });
+      const { accessToken } = await api.login({ username, password });
       setAccessToken(accessToken);
       navigate("/dashboard");
     } catch (err) {
@@ -48,7 +48,10 @@ export default function Register() {
 
   return (
     <main className="container" style={{ maxWidth: 420, paddingTop: 80 }}>
-      <h1 style={{ fontSize: "2rem" }}>Create your wallet</h1>
+      <h1 style={{ fontSize: "2rem" }}>Create your account</h1>
+      <p style={{ color: "var(--slate)", marginTop: 0 }}>
+        No wallet required to sign up — connect one later when issuing government documents.
+      </p>
       <form onSubmit={onSubmit} className="card" style={{ display: "grid", gap: 16 }}>
         <div>
           <label htmlFor="displayName">Full Name</label>
@@ -63,15 +66,19 @@ export default function Register() {
           />
         </div>
         <div>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="username">Username</label>
           <input
-            id="email"
-            type="email"
+            id="username"
+            type="text"
             required
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            placeholder="e.g. satoshi (letters, numbers, dots, hyphens)"
+            minLength={3}
+            maxLength={50}
+            pattern="[a-zA-Z0-9._-]+"
+            title="Letters, numbers, dots, underscores, and hyphens only"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
         <div>
@@ -93,7 +100,7 @@ export default function Register() {
         </button>
       </form>
       <p style={{ marginTop: 16 }}>
-        Already have a wallet? <Link to="/login">Sign in</Link>
+        Already have an account? <Link to="/login">Sign in</Link>
       </p>
     </main>
   );

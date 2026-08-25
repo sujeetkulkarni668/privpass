@@ -154,7 +154,7 @@ async function buildClient(): Promise<MidnightClient> {
   // compile have run, so importing them at module load time would break
   // `yarn typecheck`/`yarn build` in this repo before that's done.
   const [
-    { deployContract, findDeployedContract },
+    { deployContract: _deployContract, findDeployedContract },
     { indexerPublicDataProvider },
     { levelPrivateStateProvider },
     { httpClientProofProvider },

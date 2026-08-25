@@ -3,11 +3,10 @@
 // services the dashboard uses, scoped strictly to the caller's organization.
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import { requireApiKey, requireOrgRole, type AuthedRequest } from "../middleware/auth.js";
+import { requireApiKey, type AuthedRequest } from "../middleware/auth.js";
 import { prisma } from "../lib/prisma.js";
 import { verificationRequestsRouter } from "./verificationRequests.js";
 import { verificationsRouter } from "./verifications.js";
-import { credentialsRouter } from "./credentials.js";
 
 export const apiV1Router = Router();
 
