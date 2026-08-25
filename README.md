@@ -6,6 +6,7 @@
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-blue.svg)](https://midnight.network)
 [![Smart Contracts: Compact 0.5.2](https://img.shields.io/badge/Compact-0.5.2-purple.svg)](https://docs.midnight.network)
 [![Wallet: 1AM + Lace](https://img.shields.io/badge/Wallet-1AM%20%2B%20Lace-green.svg)](https://midnight.network)
+[![Setup Guide](https://img.shields.io/badge/Setup-SETUP.md-orange.svg)](SETUP.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 PrivPass is a **privacy-preserving zero-knowledge identity verification platform** built on the
@@ -303,6 +304,7 @@ flowchart LR
 
 | Doc | Covers |
 |---|---|
+| [`SETUP.md`](SETUP.md) | **Complete setup guide — start here** (Neon cloud DB, env config, wallet, credentials) |
 | [`docs/architecture.md`](docs/architecture.md) | System design |
 | [`docs/privacy.md`](docs/privacy.md) | What's private, what's public, and why |
 | [`docs/compact-contracts.md`](docs/compact-contracts.md) | Contract-by-contract breakdown |
