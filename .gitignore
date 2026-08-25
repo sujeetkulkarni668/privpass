@@ -6,3 +6,7 @@ dist/
 *.log
 .DS_Store
 contracts/scripts/test-*.ts
+
+*.tsbuildinfo
+*.log
+/backend/generate-export.ts
