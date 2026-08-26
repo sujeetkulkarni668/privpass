@@ -20,12 +20,16 @@ const rateLimit = rateLimitModule as any;
 
 const app = express();
 
+/* -------------------------------------------------------------------------- */
+/* Security                                                                   */
+/* -------------------------------------------------------------------------- */
+
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        imgSrc: ["'self'", "data:"], // data: needed for inline QR code images
+        imgSrc: ["'self'", "data:"],
         connectSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
@@ -39,7 +43,10 @@ app.use(
 
 app.use(
   cors({
-    origin: (process.env.CORS_ALLOWED_ORIGINS ?? "http://localhost:5173").split(","),
+    origin: (process.env.CORS_ALLOWED_ORIGINS ?? "http://localhost:5173")
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean),
     credentials: true,
   })
 );
@@ -57,8 +64,10 @@ app.use(
   })
 );
 
-// Global rate limit as a backstop; per-route limits (e.g. apiV1Router) are
-// stricter and API-key-scoped.
+/* -------------------------------------------------------------------------- */
+/* Rate limiting                                                              */
+/* -------------------------------------------------------------------------- */
+
 app.use(
   rateLimit({
     windowMs: 60_000,
@@ -68,17 +77,74 @@ app.use(
   })
 );
 
-app.get("/healthz", (_req, res) => res.json({ ok: true }));
+/* -------------------------------------------------------------------------- */
+/* Health checks                                                              */
+/* -------------------------------------------------------------------------- */
 
+app.get("/healthz", (_req, res) => {
+  res.json({ ok: true });
+});
+
+app.get("/api/healthz", (_req, res) => {
+  res.json({ ok: true });
+});
+
+/* -------------------------------------------------------------------------- */
+/* API routes                                                                 */
+/*                                                                            */
+/* Local development uses:                                                    */
+/*   /auth                                                                    */
+/*   /credentials                                                             */
+/*   /organizations                                                           */
+/*                                                                            */
+/* Vercel uses:                                                               */
+/*   /api/auth                                                                */
+/*   /api/credentials                                                         */
+/*   /api/organizations                                                       */
+/*                                                                            */
+/* Both are intentionally supported so local development remains unchanged.   */
+/* -------------------------------------------------------------------------- */
+
+/* Authentication */
 app.use("/auth", authRouter);
-app.use("/credentials", requireUser, credentialsRouter);
-app.use("/organizations", organizationsRouter);
-app.use("/verification-requests", requireUser, verificationRequestsRouter);
-app.use("/verifications", verificationsRouter);
-app.use("/api/v1", apiV1Router);
-app.use("/admin", adminRouter);
+app.use("/api/auth", authRouter);
 
-// Never leak stack traces or internal error detail to clients.
+/* Credentials */
+app.use("/credentials", requireUser, credentialsRouter);
+app.use("/api/credentials", requireUser, credentialsRouter);
+
+/* Organizations */
+app.use("/organizations", organizationsRouter);
+app.use("/api/organizations", organizationsRouter);
+
+/* Verification requests */
+app.use(
+  "/verification-requests",
+  requireUser,
+  verificationRequestsRouter
+);
+
+app.use(
+  "/api/verification-requests",
+  requireUser,
+  verificationRequestsRouter
+);
+
+/* Verifications */
+app.use("/verifications", verificationsRouter);
+app.use("/api/verifications", verificationsRouter);
+
+/* API v1 */
+app.use("/api/v1", apiV1Router);
+
+/* Admin */
+app.use("/admin", adminRouter);
+app.use("/api/admin", adminRouter);
+
+/* -------------------------------------------------------------------------- */
+/* Error handler                                                              */
+/* -------------------------------------------------------------------------- */
+
 app.use(
   (
     err: any,
@@ -87,9 +153,16 @@ app.use(
     _next: express.NextFunction
   ) => {
     req.log?.error({ err }, "unhandled_error");
-    res.status(500).json({ error: "internal_error" });
+
+    res.status(500).json({
+      error: "internal_error",
+    });
   }
 );
+
+/* -------------------------------------------------------------------------- */
+/* Server                                                                     */
+/* -------------------------------------------------------------------------- */
 
 const port = Number(process.env.PORT ?? 4000);
 
