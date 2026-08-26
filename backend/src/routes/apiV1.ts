@@ -2,7 +2,7 @@
 // via API key rather than user session. Thin wrappers around the same
 // services the dashboard uses, scoped strictly to the caller's organization.
 import { Router } from "express";
-import rateLimit from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 import { requireApiKey, type AuthedRequest } from "../middleware/auth.js";
 import { prisma } from "../lib/prisma.js";
 import { verificationRequestsRouter } from "./verificationRequests.js";

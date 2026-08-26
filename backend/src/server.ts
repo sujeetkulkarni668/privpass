@@ -3,7 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 import { pinoHttp } from "pino-http";
 
 import { authRouter } from "./routes/auth.js";
@@ -18,7 +18,7 @@ import { requireUser } from "./middleware/auth.js";
 const app = express();
 
 app.use(
-  helmet({
+  (helmet as any)({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
