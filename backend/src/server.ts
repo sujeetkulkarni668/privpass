@@ -91,18 +91,6 @@ app.get("/api/healthz", (_req, res) => {
 
 /* -------------------------------------------------------------------------- */
 /* API routes                                                                 */
-/*                                                                            */
-/* Local development uses:                                                    */
-/*   /auth                                                                    */
-/*   /credentials                                                             */
-/*   /organizations                                                           */
-/*                                                                            */
-/* Vercel uses:                                                               */
-/*   /api/auth                                                                */
-/*   /api/credentials                                                         */
-/*   /api/organizations                                                       */
-/*                                                                            */
-/* Both are intentionally supported so local development remains unchanged.   */
 /* -------------------------------------------------------------------------- */
 
 /* Authentication */
@@ -167,8 +155,10 @@ app.use(
 const port = Number(process.env.PORT ?? 4000);
 
 app.listen(port, () => {
-  // eslint-disable-next-line no-console
   console.log(`PrivPass API listening on :${port}`);
 });
 
-export { app };
+/*
+ * Vercel Node runtime expects the default export to be the server/function.
+ */
+export default app;
