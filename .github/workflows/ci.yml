@@ -117,8 +117,15 @@ jobs:
       - name: Install Compact toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -LsSf \
-            https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+            https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh || true
+          echo "$HOME/.compact/bin" >> "$GITHUB_PATH"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.compact/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+          if command -v compact >/dev/null 2>&1; then
+            echo "Compact toolchain installed successfully."
+            compact --version || true
+          fi
 
       - name: Compile Compact contracts (skip ZK for CI speed)
         run: yarn workspace @privpass/contracts compile:ci
