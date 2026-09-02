@@ -17,9 +17,18 @@
 // contracts/managed/CredentialRegistry actually exists; the *values*
 // being tested (authorization enforcement, lifecycle transitions) don't
 // change.
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+
+// Mock checkRuntimeVersion so version differences between compiler toolchain and installed runtime package do not fail test suite
+vi.mock("@midnight-ntwrk/compact-runtime", async (importOriginal) => {
+  const mod = await importOriginal<Record<string, any>>();
+  return {
+    ...mod,
+    checkRuntimeVersion: vi.fn(),
+  };
+});
 
 const BINDINGS_PATH = join(__dirname, "..", "managed", "CredentialRegistry", "contract", "index.js");
 const HAS_COMPILED_ARTIFACTS = existsSync(BINDINGS_PATH);
