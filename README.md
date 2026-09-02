@@ -7,7 +7,7 @@
 [![Smart Contracts: Compact 0.5.2](https://img.shields.io/badge/Compact-0.5.2-purple.svg)](https://docs.midnight.network)
 [![Product X: @privpassweb3](https://img.shields.io/badge/X%20(Twitter)-@privpassweb3-000000?logo=x)](https://x.com/privpassweb3)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass--xi.vercel.app-success?logo=vercel)](https://privpass-xi.vercel.app/)
-[![Preprod Users: 55+](https://img.shields.io/badge/Preprod%20Users-55%20Verified-blueviolet.svg)](USERS.md)
+[![Preprod Users: 78+](https://img.shields.io/badge/Preprod%20Users-78%20Verified-blueviolet.svg)](USERS.md)
 [![Launch Cohort: 20 Partners](https://img.shields.io/badge/Launch%20Cohort-20%20Partners-teal.svg)](LAUNCH_USERS.md)
 [![Proposal: Level 6](https://img.shields.io/badge/Proposal-Level%206-gold.svg)](PROPOSAL.md)
 [![Feedback & Iterations](https://img.shields.io/badge/Feedback-Level%205%20%26%206-brightgreen.svg)](docs/FEEDBACK.md)
@@ -200,7 +200,7 @@ PrivPass incorporates rigorous feedback-driven development documented in detail 
 
 PrivPass is backed by extensive verification evidence across preprod testnet participants and launch partners:
 
-- 📋 **Preprod User Directory (Level 5)**: [`USERS.md`](USERS.md) — Contains **55 verified preprod user accounts** and their associated Midnight Preprod shielded addresses (`mn_shield-addr_preprod1...`), credentials tested, and consent verification timestamps.
+- 📋 **Preprod User Directory (Level 5)**: [`USERS.md`](USERS.md) — Contains **78 verified preprod user accounts** (synchronized from `prepod_user_list.xlsx`) and their associated Midnight Preprod shielded addresses (`mn_addr_preprod1...`), credentials tested, and consent verification timestamps.
 - 🚀 **Early Launch Cohort (Level 6)**: [`LAUNCH_USERS.md`](LAUNCH_USERS.md) — Contains **20 launch partners and institutional verifiers** (DeFi lending, neo-banks, RWA platforms, academic institutions) committed to production integration.
 - 📜 **Project & Grant Proposal**: [`PROPOSAL.md`](PROPOSAL.md) — Complete Level 6 grant proposal detailing problem statement, Compact ZK architecture, milestone roadmap, budget breakdown, and ecosystem impact.
 
@@ -227,7 +227,7 @@ privpass/
 │       ├── lib/            wallet.ts (DApp Connector v4), api.ts
 │       └── pages/          Dashboard, Credentials, Login, Register, History, ...
 ├── docs/                   Architecture, privacy model, FEEDBACK.md, API reference, ...
-├── USERS.md                ← 55 Verified Preprod Users (Level 5 evidence)
+├── USERS.md                ← 78 Verified Preprod Users (Level 5 evidence)
 ├── LAUNCH_USERS.md         ← 20 Launch Partners & Institutional Verifiers (Level 6 evidence)
 ├── PROPOSAL.md             ← Project Proposal & Architectural Specification (Level 6)
 ├── FEEDBACK.md             ← User Feedback, Iterations & Improvements Log

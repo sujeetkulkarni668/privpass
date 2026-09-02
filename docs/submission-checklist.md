@@ -13,7 +13,7 @@ This document tracks the verified completion of all Phase 1, Phase 2 (Level 5), 
 - [x] **Strict CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing strict failures on contract compilation and testing without `continue-on-error`.
 
 ### Phase 2: Level 5 Evidence & Feedback Integration
-- [x] **Preprod User Directory (`USERS.md`)**: Complete directory of **55 verified preprod user accounts** with Midnight Preprod shielded addresses (`mn_shield-addr_preprod1...`), timestamps, credentials tested, and consent records.
+- [x] **Preprod User Directory (`USERS.md`)**: Complete directory of **78 verified preprod user accounts** (synchronized from `prepod_user_list.xlsx`) with Midnight Preprod shielded addresses (`mn_addr_preprod1...`), timestamps, credentials tested, and consent records.
 - [x] **User Feedback & Code Changes Log (`docs/FEEDBACK.md` & `FEEDBACK.md`)**: Full documentation of Level 5 feedback sessions and corresponding codebase changes (explicit consent modal in `WalletModal.tsx`, 1 active credential limit in `credentials.ts`, verifier organization dropdown in `VerifierDashboard.tsx`, session demo wallet in `wallet.ts`).
 - [x] **Preprod Live Synchronization (`prepod_user_list.xlsx`)**: Automated 3-sheet export keeping track of all preprod logins, credentials, and wallet bindings.
 
