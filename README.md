@@ -5,8 +5,8 @@
 [![CI](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-blue.svg)](https://midnight.network)
 [![Smart Contracts: Compact 0.5.2](https://img.shields.io/badge/Compact-0.5.2-purple.svg)](https://docs.midnight.network)
-[![Product X: @PrivPass_ZK](https://img.shields.io/badge/X%20(Twitter)-@PrivPass__ZK-000000?logo=x)](https://x.com/PrivPass_ZK)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass.vercel.app-success?logo=vercel)](https://privpass.vercel.app)
+[![Product X: @privpassweb3](https://img.shields.io/badge/X%20(Twitter)-@privpassweb3-000000?logo=x)](https://x.com/privpassweb3)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass--xi.vercel.app-success?logo=vercel)](https://privpass-xi.vercel.app/)
 [![Preprod Users: 55+](https://img.shields.io/badge/Preprod%20Users-55%20Verified-blueviolet.svg)](USERS.md)
 [![Launch Cohort: 20 Partners](https://img.shields.io/badge/Launch%20Cohort-20%20Partners-teal.svg)](LAUNCH_USERS.md)
 [![Proposal: Level 6](https://img.shields.io/badge/Proposal-Level%206-gold.svg)](PROPOSAL.md)
@@ -21,8 +21,8 @@ a verifier via zero-knowledge proofs — without the verifier ever seeing or sto
 date of birth, or physical address.
 
 > 🚀 **Status: Working MVP — Live on Midnight Preprod & Public Demo.**
-> - **Live Public Demo**: [https://privpass.vercel.app](https://privpass.vercel.app)
-> - **Product X (Twitter)**: [@PrivPass_ZK](https://x.com/PrivPass_ZK)
+> - **Live Public Demo**: [https://privpass-xi.vercel.app/](https://privpass-xi.vercel.app/)
+> - **Product X (Twitter)**: [@privpassweb3](https://x.com/privpassweb3)
 > - **Preprod Contracts**: Compiled with Compact 0.5.2 and deployed to Midnight Preprod testnet.
 > - **Wallet Support**: Midnight wallets (1AM + Lace) connect via official DApp Connector API v4 + Session Demo Wallet.
 
@@ -54,11 +54,11 @@ date of birth, or physical address.
 
 PrivPass is deployed and accessible publicly for demonstration and evaluation:
 
-- 🌐 **Live Web Application (Vercel)**: [https://privpass.vercel.app](https://privpass.vercel.app)
+- 🌐 **Live Web Application (Vercel)**: [https://privpass-xi.vercel.app/](https://privpass-xi.vercel.app/)
 - 🔌 **Backend API**: Integrated via serverless endpoints and connected to Midnight Preprod RPC.
 
 ### Quick Test Walkthrough on Live Demo:
-1. Visit [https://privpass.vercel.app](https://privpass.vercel.app)
+1. Visit [https://privpass-xi.vercel.app/](https://privpass-xi.vercel.app/)
 2. Sign in with the seeded demo account:
    - **Username**: `demo.user`
    - **Password**: `ChangeMe!12345`
@@ -75,7 +75,7 @@ PrivPass is deployed and accessible publicly for demonstration and evaluation:
 
 ## Product X Profile & Brand Assets
 
-- 𝕏 **Official Product Handle**: [@PrivPass_ZK](https://x.com/PrivPass_ZK)
+- 𝕏 **Official Product Handle**: [@privpassweb3](https://x.com/privpassweb3) (URL: [https://x.com/privpassweb3](https://x.com/privpassweb3))
 - **Profile Bio**: *"Privacy-Preserving Zero-Knowledge Identity Verification Platform built on Midnight Network | Verify identity, reveal nothing unnecessary. #ZeroKnowledge #MidnightNetwork"*
 - **Product Post & Announcement Thread**:
   > *"🚀 Introducing PrivPass: Zero-Knowledge identity verification built on @MidnightNtwrk with Compact smart contracts. Prove your age, tax ID format, and residency to verifiers without surrendering raw documents or creating central honeypots. Verify identity. Reveal nothing unnecessary. #MidnightNetwork #ZK #Privacy"*

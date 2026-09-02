@@ -108,8 +108,8 @@ The PrivPass backend and database enforce a strict mathematical invariant: **No 
 ---
 
 ## 6. Community & Social Presence
-
-- **Product X (Twitter)**: [@PrivPass_ZK](https://x.com/PrivPass_ZK)
-- **Live Demo**: [https://privpass.vercel.app](https://privpass.vercel.app)
+ 
+- **Product X (Twitter)**: [@privpassweb3](https://x.com/privpassweb3)
+- **Live Demo**: [https://privpass-xi.vercel.app/](https://privpass-xi.vercel.app/)
 - **Source Code Repository**: [https://github.com/sujeetkulkarni668/privpass](https://github.com/sujeetkulkarni668/privpass)
 - **Documentation**: [docs/](docs/)

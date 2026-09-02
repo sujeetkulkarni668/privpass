@@ -7,8 +7,8 @@ This document tracks the verified completion of all Phase 1, Phase 2 (Level 5), 
 ## Completed Submission Deliverables
 
 ### Phase 1: Product Foundation & Live Verification
-- [x] **Product X (Twitter) Profile**: Verified live profile, bio, and launch announcements ([@PrivPass_ZK](https://x.com/PrivPass_ZK)).
-- [x] **Public Live Demo**: Deployed and fully accessible at [https://privpass.vercel.app](https://privpass.vercel.app).
+- [x] **Product X (Twitter) Profile**: Verified live profile, bio, and launch announcements ([@privpassweb3](https://x.com/privpassweb3)).
+- [x] **Public Live Demo**: Deployed and fully accessible at [https://privpass-xi.vercel.app/](https://privpass-xi.vercel.app/).
 - [x] **Midnight Preprod Smart Contracts**: `CredentialRegistry`, `IdentityVerification`, `VerificationRequest`, and `RevocationRegistry` compiled with Compact 0.5.2 and deployed to Midnight Preprod (`testnet`).
 - [x] **Strict CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing strict failures on contract compilation and testing without `continue-on-error`.
 
