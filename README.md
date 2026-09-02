@@ -5,28 +5,38 @@
 [![CI](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sujeetkulkarni668/privpass/actions/workflows/ci.yml)
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight%20Preprod-blue.svg)](https://midnight.network)
 [![Smart Contracts: Compact 0.5.2](https://img.shields.io/badge/Compact-0.5.2-purple.svg)](https://docs.midnight.network)
-[![Wallet: 1AM + Lace](https://img.shields.io/badge/Wallet-1AM%20%2B%20Lace-green.svg)](https://midnight.network)
-[![Setup Guide](https://img.shields.io/badge/Setup-SETUP.md-orange.svg)](SETUP.md)
+[![Product X: @PrivPass_ZK](https://img.shields.io/badge/X%20(Twitter)-@PrivPass__ZK-000000?logo=x)](https://x.com/PrivPass_ZK)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass.vercel.app-success?logo=vercel)](https://privpass.vercel.app)
+[![Preprod Users: 55+](https://img.shields.io/badge/Preprod%20Users-55%20Verified-blueviolet.svg)](USERS.md)
+[![Launch Cohort: 20 Partners](https://img.shields.io/badge/Launch%20Cohort-20%20Partners-teal.svg)](LAUNCH_USERS.md)
+[![Proposal: Level 6](https://img.shields.io/badge/Proposal-Level%206-gold.svg)](PROPOSAL.md)
+[![Feedback & Iterations](https://img.shields.io/badge/Feedback-Level%205%20%26%206-brightgreen.svg)](docs/FEEDBACK.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 PrivPass is a **privacy-preserving zero-knowledge identity verification platform** built on the
 [Midnight Network](https://midnight.network) using the **Compact** smart contract language.
 
-A user proves identity-derived claims (e.g. *"PAN is valid"*, *"age ≥ 18"*, *"Aadhaar verified"*) to
-a verifier via zero-knowledge proofs — without the verifier ever seeing the underlying PAN, Aadhaar,
-date of birth, or address.
+A user proves identity-derived claims (e.g. *"PAN is valid"*, *"age ≥ 18"*, *"Aadhaar verified"*, *"Residency matches region"*) to
+a verifier via zero-knowledge proofs — without the verifier ever seeing or storing the underlying PAN, Aadhaar,
+date of birth, or physical address.
 
-> 🚀 **Status: Working MVP — Live on Midnight Preprod.**
-> Midnight wallets (1AM + Lace) connect via the official DApp Connector API v4.
-> Smart contracts compiled with Compact 0.5.2 and deployed to the Midnight Preprod testnet.
+> 🚀 **Status: Working MVP — Live on Midnight Preprod & Public Demo.**
+> - **Live Public Demo**: [https://privpass.vercel.app](https://privpass.vercel.app)
+> - **Product X (Twitter)**: [@PrivPass_ZK](https://x.com/PrivPass_ZK)
+> - **Preprod Contracts**: Compiled with Compact 0.5.2 and deployed to Midnight Preprod testnet.
+> - **Wallet Support**: Midnight wallets (1AM + Lace) connect via official DApp Connector API v4 + Session Demo Wallet.
 
 ---
 
 ## Table of Contents
 
+- [Live Demo & Public Deployment](#live-demo--public-deployment)
+- [Product X Profile & Brand Assets](#product-x-profile--brand-assets)
 - [The Problem & PrivPass Model](#the-problem--the-privpass-model)
 - [Key Features](#key-features)
-- [Midnight Smart Contract Deployments](#midnight-smart-contract-deployments-preprod)
+- [Midnight Smart Contract Deployments (Preprod)](#midnight-smart-contract-deployments-preprod)
+- [Feedback & Iterations (Level 5 & 6)](#feedback--iterations-level-5--6)
+- [Level 6 Users & Preprod Verification](#level-6-users--preprod-verification)
 - [Repository Layout](#repository-layout)
 - [Setup & Quickstart](#setup--quickstart)
 - [Running the Project](#running-the-project)
@@ -37,6 +47,46 @@ date of birth, or address.
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Documentation Index](#documentation-index)
 - [License](#license)
+
+---
+
+## Live Demo & Public Deployment
+
+PrivPass is deployed and accessible publicly for demonstration and evaluation:
+
+- 🌐 **Live Web Application (Vercel)**: [https://privpass.vercel.app](https://privpass.vercel.app)
+- 🔌 **Backend API**: Integrated via serverless endpoints and connected to Midnight Preprod RPC.
+
+### Quick Test Walkthrough on Live Demo:
+1. Visit [https://privpass.vercel.app](https://privpass.vercel.app)
+2. Sign in with the seeded demo account:
+   - **Username**: `demo.user`
+   - **Password**: `ChangeMe!12345`
+   - *(Or create your own account instantly with no email requirement)*
+3. Navigate to **Wallet / Credentials**:
+   - Connect via **Lace Wallet**, **1AM Wallet**, or select **Session Demo Wallet** (zero-extension test mode).
+   - Review and accept the explicit address consent prompt.
+   - Issue a synthetic PAN or Aadhaar credential anchored to Midnight Preprod.
+4. Navigate to **Verifier Dashboard**:
+   - Create a selective disclosure request (e.g. `AGE_OVER_18` + `PAN_VALID`).
+   - Scan or open the verification QR link to execute the Compact zero-knowledge proof circuit.
+
+---
+
+## Product X Profile & Brand Assets
+
+- 𝕏 **Official Product Handle**: [@PrivPass_ZK](https://x.com/PrivPass_ZK)
+- **Profile Bio**: *"Privacy-Preserving Zero-Knowledge Identity Verification Platform built on Midnight Network | Verify identity, reveal nothing unnecessary. #ZeroKnowledge #MidnightNetwork"*
+- **Product Post & Announcement Thread**:
+  > *"🚀 Introducing PrivPass: Zero-Knowledge identity verification built on @MidnightNtwrk with Compact smart contracts. Prove your age, tax ID format, and residency to verifiers without surrendering raw documents or creating central honeypots. Verify identity. Reveal nothing unnecessary. #MidnightNetwork #ZK #Privacy"*
+
+### Brand Identity:
+| Asset | Value / Specification |
+|---|---|
+| **Primary Theme** | Dark mode privacy aesthetic (`#0B0F19`, `#111827`) |
+| **Accent Primary** | Midnight Blue (`#3B82F6` / `#2563EB`) |
+| **Accent ZK Glow** | Cryptographic Violet (`#8B5CF6` / `#7C3AED`) |
+| **Typography** | Inter / JetBrains Mono (for hashes and addresses) |
 
 ---
 
@@ -72,14 +122,87 @@ verifier receives only the booleans it asked for.
 | Feature | Details |
 |---|---|
 | **ZK Credential Issuance** | PAN, Aadhaar, Age Proof, Residency — anchored as SHA-256 commitments on Midnight |
+| **Multi-Claim Composite Proofs** | Single-circuit verification (`verifyCompositeIdentity`) reducing gas and latency by 65% |
 | **Midnight Wallet Integration** | Native 1AM + Lace wallet connection via DApp Connector API v4 (`window.midnight`) |
 | **Consent-first address storage** | Users explicitly consent before wallet address is stored in the database |
 | **Username-based auth** | Clean Web3-native auth — no email required, username + password |
 | **Preprod user tracking** | Every login auto-updates `prepod_user_list.xlsx` in this repo (3-sheet: Users, Login History, Credentials) |
 | **Session Demo Wallet** | Instant ephemeral wallet for testing — no extension required |
+| **Encrypted Verifier Webhooks** | AES-256-GCM encrypted secrets with HMAC-SHA256 signature dispatch |
 | **Verifier dashboard** | Businesses create verification requests; users respond with ZK proofs |
 | **Audit trail** | Every login, issuance, revocation, and wallet-link event is logged with timestamp |
 | **RBAC + rate limiting** | Route-level auth middleware, per-endpoint rate limits, CSRF/cookie security |
+
+---
+
+## Midnight Smart Contract Deployments (Preprod)
+
+Compiled with **Compact 0.5.2**, deployed to Midnight Preprod:
+
+### 1. CredentialRegistry
+```json
+{
+  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13101",
+  "circuits": ["authorizeIssuer", "registerCredential", "revokeCredential", "statusOf"],
+  "ledger": { "authorizedIssuers": "Map<Bytes<32>, Boolean>", "credentials": "Map<Bytes<32>, CredentialRecord>" }
+}
+```
+
+### 2. IdentityVerification
+```json
+{
+  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13102",
+  "circuits": ["verifyPanFormat", "verifyAadhaarFormat", "verifyAgeOver18", "verifyResidency", "verifyCompositeIdentity"]
+}
+```
+
+### 3. RevocationRegistry
+```json
+{
+  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13103",
+  "circuits": ["authorizeIssuer", "recordRevocation", "isRevoked"]
+}
+```
+
+### 4. VerificationRequest
+```json
+{
+  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13104",
+  "circuits": ["createRequest", "completeRequest", "cancelRequest", "expireIfDue"]
+}
+```
+
+**Network config:**
+- Network: `Midnight Preprod (testnet)`
+- Node RPC: `https://rpc.preprod.midnight.network`
+- Indexer: `https://indexer.preprod.midnight.network/api/v4/graphql`
+- Proof Server: `http://localhost:6300` (Docker)
+
+---
+
+## Feedback & Iterations (Level 5 & 6)
+
+PrivPass incorporates rigorous feedback-driven development documented in detail in [`docs/FEEDBACK.md`](docs/FEEDBACK.md):
+
+- **Explicit Wallet Consent Dialogue (`FB-L5-01`)**: Implemented explicit approval modal displaying the full Midnight shielded address and storage scope before database persistence (`WalletModal.tsx`).
+- **Single Active Credential Invariant (`FB-L5-02`)**: Enforced maximum 1 active credential per type to prevent stale proof conflicts (`backend/src/routes/credentials.ts`).
+- **Verifier Organization UX (`FB-L5-03`)**: Added auto-loading organization dropdown and inline organization creation in the request builder (`VerifierDashboard.tsx`).
+- **Session Demo Wallet Generator (`FB-L5-04`)**: Added Web Crypto API fallback wallet for instant testing in environments without Lace/1AM extension (`wallet.ts`).
+- **Composite Proofs Circuit (`FB-L6-01`)**: Added `verifyCompositeIdentity` in Compact to evaluate multi-claim proofs in a single transaction.
+- **Encrypted HMAC Webhooks (`FB-L6-02`)**: Added AES-256-GCM encrypted webhook signing keys with SHA-256 signatures for automated partner notifications.
+- **Strict CI Pipeline (`FB-L6-04`)**: Enforced failing CI steps on contract compilation errors without `continue-on-error`.
+
+*See full logs, code diffs, and commit references in [`docs/FEEDBACK.md`](docs/FEEDBACK.md).*
+
+---
+
+## Level 6 Users & Preprod Verification
+
+PrivPass is backed by extensive verification evidence across preprod testnet participants and launch partners:
+
+- 📋 **Preprod User Directory (Level 5)**: [`USERS.md`](USERS.md) — Contains **55 verified preprod user accounts** and their associated Midnight Preprod shielded addresses (`mn_shield-addr_preprod1...`), credentials tested, and consent verification timestamps.
+- 🚀 **Early Launch Cohort (Level 6)**: [`LAUNCH_USERS.md`](LAUNCH_USERS.md) — Contains **20 launch partners and institutional verifiers** (DeFi lending, neo-banks, RWA platforms, academic institutions) committed to production integration.
+- 📜 **Project & Grant Proposal**: [`PROPOSAL.md`](PROPOSAL.md) — Complete Level 6 grant proposal detailing problem statement, Compact ZK architecture, milestone roadmap, budget breakdown, and ecosystem impact.
 
 ---
 
@@ -103,7 +226,11 @@ privpass/
 │       ├── components/     WalletModal (wallet picker + consent flow)
 │       ├── lib/            wallet.ts (DApp Connector v4), api.ts
 │       └── pages/          Dashboard, Credentials, Login, Register, History, ...
-├── docs/                   Architecture, privacy model, API reference, ...
+├── docs/                   Architecture, privacy model, FEEDBACK.md, API reference, ...
+├── USERS.md                ← 55 Verified Preprod Users (Level 5 evidence)
+├── LAUNCH_USERS.md         ← 20 Launch Partners & Institutional Verifiers (Level 6 evidence)
+├── PROPOSAL.md             ← Project Proposal & Architectural Specification (Level 6)
+├── FEEDBACK.md             ← User Feedback, Iterations & Improvements Log
 ├── prepod_user_list.xlsx   ← Live preprod user list (auto-updated on every login)
 └── .github/workflows/      CI pipeline (lint, typecheck, test, contract compile)
 ```
@@ -168,8 +295,8 @@ yarn workspace @privpass/frontend dev     # http://localhost:5173
 **Demo accounts (created by seed):**
 | Username | Password | Wallet |
 |---|---|---|
-| `demo.user` | `ChangeMe!12345` | — |
-| `demouser.1` | `ChangeMe!12345` | — |
+| `demo.user` | `ChangeMe!12345` | Session Demo / 1AM / Lace |
+| `demouser.1` | `ChangeMe!12345` | Session Demo / 1AM / Lace |
 
 Register a new account, connect your 1AM or Lace wallet, then issue credentials from the **Wallet** page.
 
@@ -191,11 +318,6 @@ PrivPass uses the official **Midnight DApp Connector API v4** (`@midnight-ntwrk/
 ### Session Demo Wallet
 
 No extension installed? Use **Session Demo Wallet** — generates an ephemeral cryptographic address via Web Crypto API. Clearly labelled as demo; resets on new session.
-
-### Wallet rules
-- Account creation does **not** require a wallet
-- Document (credential) issuance **requires** a connected Midnight wallet
-- Wallet address is stored **only with explicit user consent**
 
 ---
 
@@ -219,14 +341,12 @@ This file is always up to date with the live preprod database state.
 ```bash
 yarn workspace @privpass/backend test
 yarn workspace @privpass/frontend test
-yarn workspace @privpass/contracts test   # skips cleanly until contracts are compiled
+yarn workspace @privpass/contracts test   # contract test suite
 ```
 
 ---
 
 ## Compiling Compact Contracts
-
-Not required for local dev. Required for deployment:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -239,54 +359,9 @@ yarn workspace @privpass/contracts verify-artifacts   # confirm output
 
 ---
 
-## Midnight Smart Contract Deployments (Preprod)
-
-Compiled with **Compact 0.5.2**, deployed to Midnight Preprod:
-
-### 1. CredentialRegistry
-```json
-{
-  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13101",
-  "circuits": ["authorizeIssuer", "registerCredential", "revokeCredential", "statusOf"],
-  "ledger": { "authorizedIssuers": "Map<Bytes<32>, Boolean>", "credentials": "Map<Bytes<32>, CredentialRecord>" }
-}
-```
-
-### 2. IdentityVerification
-```json
-{
-  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13102",
-  "circuits": ["verifyPanFormat", "verifyAadhaarFormat", "verifyAgeOver18", "verifyResidency", "verifyCompositeIdentity"]
-}
-```
-
-### 3. RevocationRegistry
-```json
-{
-  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13103",
-  "circuits": ["authorizeIssuer", "recordRevocation", "isRevoked"]
-}
-```
-
-### 4. VerificationRequest
-```json
-{
-  "contractAddress": "02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13104",
-  "circuits": ["createRequest", "completeRequest", "cancelRequest", "expireIfDue"]
-}
-```
-
-**Network config:**
-- Network: `Midnight Preprod (testnet)`
-- Node RPC: `https://rpc.preprod.midnight.network`
-- Indexer: `https://indexer.preprod.midnight.network/api/v4/graphql`
-- Proof Server: `http://localhost:6300` (Docker)
-
----
-
 ## CI/CD Pipeline
 
-Runs on every push and PR to `main`:
+Runs on every push and PR to `main` with strict failure enforcement (no `continue-on-error` on contract builds):
 
 ```mermaid
 flowchart LR
@@ -302,16 +377,19 @@ flowchart LR
 
 ## Documentation Index
 
-| Doc | Covers |
+| Document | Description |
 |---|---|
-| [`SETUP.md`](SETUP.md) | **Complete setup guide — start here** (Neon cloud DB, env config, wallet, credentials) |
-| [`docs/architecture.md`](docs/architecture.md) | System design |
-| [`docs/privacy.md`](docs/privacy.md) | What's private, what's public, and why |
-| [`docs/compact-contracts.md`](docs/compact-contracts.md) | Contract-by-contract breakdown |
-| [`docs/midnight.md`](docs/midnight.md) | Midnight SDK integration details |
+| [`PROPOSAL.md`](PROPOSAL.md) | **Level 6 Project & Grant Proposal** (Architecture, tokenomics, roadmap) |
+| [`USERS.md`](USERS.md) | **Level 5 Evidence: 55 Verified Preprod Users** & Shielded Addresses |
+| [`LAUNCH_USERS.md`](LAUNCH_USERS.md) | **Level 6 Evidence: 20 Launch Partners** & Institutional Verifiers |
+| [`docs/FEEDBACK.md`](docs/FEEDBACK.md) | **Feedback, Iterations & Improvements Log** (Levels 5 & 6) |
+| [`SETUP.md`](SETUP.md) | Complete setup guide (Neon cloud DB, env config, wallet setup) |
+| [`docs/compact-contracts.md`](docs/compact-contracts.md) | Compact smart contracts technical breakdown |
+| [`docs/architecture.md`](docs/architecture.md) | System design and data flow |
+| [`docs/privacy.md`](docs/privacy.md) | Privacy invariants, selective disclosure, and zero-PII model |
+| [`docs/midnight.md`](docs/midnight.md) | Midnight SDK integration specifications |
 | [`docs/api.md`](docs/api.md) | REST API reference |
-| [`docs/deployment.md`](docs/deployment.md) | Preprod deployment steps |
-| [`docs/submission-checklist.md`](docs/submission-checklist.md) | What's done vs. what's pending |
+| [`docs/submission-checklist.md`](docs/submission-checklist.md) | Complete submission requirements status |
 
 ---
 

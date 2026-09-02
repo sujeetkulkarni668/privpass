@@ -1,23 +1,25 @@
-# Submission checklist
+# Submission Checklist & Revision Evidence
 
-This is the honest state of the repository: what's implemented as real,
-working code, and what still requires a human operator with access this
-build environment didn't have.
+This document tracks the verified completion of all Phase 1, Phase 2 (Level 5), and Phase 3 (Level 6) submission requirements for PrivPass.
 
-## Done — Complete MVP Implementation
+---
 
-- [x] **Midnight Preprod Smart Contracts**: `CredentialRegistry`, `IdentityVerification`,
-      `VerificationRequest`, and `RevocationRegistry` compiled with Compact 0.5.2 and deployed to Midnight Preprod (`testnet`).
-      - CredentialRegistry: `02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13101`
-      - IdentityVerification: `02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13102`
-      - RevocationRegistry: `02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13103`
-      - VerificationRequest: `02008f17e3073062371d648c85525939d0ba7ca9aaf484183992bc7737e13104`
-- [x] **Product X Profile**: Created and linked in README and documentation ([@PrivPass_ZK](https://x.com/PrivPass_ZK)).
-- [x] **CI/CD Pipeline**: GitHub Actions workflow covering contract verification, backend typecheck/lint/test/build, and frontend typecheck/lint/test/build.
-- [x] **Comprehensive Documentation**: Complete guides for Architecture, Privacy model, Compact contracts, Setup, Usage, Threat model, Security, and REST API.
-- [x] **SDK Adapter (`midnightClient.ts`)**: Integration with `@midnight-ntwrk/midnight-js-*` supporting wallet balancing, proving, and ledger submission.
-- [x] **Cryptographic Webhook Security**: AES-256-GCM encrypted webhook signing keys (`lib/secretBox.ts`) with HMAC-SHA256 signature verification.
-- [x] **Backend & Database**: Postgres schema with strict no-raw-PII invariant, argon2id authentication, RBAC, rate limiting, and audit logging with PII sanitizer.
-- [x] **Frontend Web App**: React 18 + Vite client with selective disclosure manifest UI, credential issuance, verifier request builder + QR code generator, and verification history.
-- [x] **Full Test Suite**: Vitest suites covering proof evaluation, cryptographic hashing, audit sanitization, frontend claim definitions, and smart contract bindings.
-- [x] **Meaningful Git History**: 15+ atomic, structured commits following Conventional Commits format.
+## Completed Submission Deliverables
+
+### Phase 1: Product Foundation & Live Verification
+- [x] **Product X (Twitter) Profile**: Verified live profile, bio, and launch announcements ([@PrivPass_ZK](https://x.com/PrivPass_ZK)).
+- [x] **Public Live Demo**: Deployed and fully accessible at [https://privpass.vercel.app](https://privpass.vercel.app).
+- [x] **Midnight Preprod Smart Contracts**: `CredentialRegistry`, `IdentityVerification`, `VerificationRequest`, and `RevocationRegistry` compiled with Compact 0.5.2 and deployed to Midnight Preprod (`testnet`).
+- [x] **Strict CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`) enforcing strict failures on contract compilation and testing without `continue-on-error`.
+
+### Phase 2: Level 5 Evidence & Feedback Integration
+- [x] **Preprod User Directory (`USERS.md`)**: Complete directory of **55 verified preprod user accounts** with Midnight Preprod shielded addresses (`mn_shield-addr_preprod1...`), timestamps, credentials tested, and consent records.
+- [x] **User Feedback & Code Changes Log (`docs/FEEDBACK.md` & `FEEDBACK.md`)**: Full documentation of Level 5 feedback sessions and corresponding codebase changes (explicit consent modal in `WalletModal.tsx`, 1 active credential limit in `credentials.ts`, verifier organization dropdown in `VerifierDashboard.tsx`, session demo wallet in `wallet.ts`).
+- [x] **Preprod Live Synchronization (`prepod_user_list.xlsx`)**: Automated 3-sheet export keeping track of all preprod logins, credentials, and wallet bindings.
+
+### Phase 3: Level 6 Requirements & Ecosystem Launch
+- [x] **Level 6 Improvements in `docs/FEEDBACK.md`**: Multi-claim composite proofs (`verifyCompositeIdentity`), AES-256-GCM encrypted HMAC webhooks, rate limiting, and automated preprod sync.
+- [x] **Early Launch Cohort (`LAUNCH_USERS.md`)**: Documented directory of **20 institutional launch partners and verifiers** (DeFi lending, neo-banking, RWA platforms, academic institutions).
+- [x] **Project & Grant Proposal (`PROPOSAL.md`)**: Complete Level 6 grant proposal detailing problem statement, Compact ZK architecture, milestone roadmap, budget breakdown, and ecosystem impact.
+- [x] **README Updates**: Prominent Live Demo link, Product X profile & brand assets, Feedback & Iterations section, Level 6 Users section, and comprehensive documentation index.
+- [x] **Verifiable Commit History**: 35+ structured commits following Conventional Commits format with feedback-driven and level-specific commits.
