@@ -9,7 +9,6 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass--xi.vercel.app-success?logo=vercel)](https://privpass-xi.vercel.app/)
 [![Preprod Users: 78+](https://img.shields.io/badge/Preprod%20Users-78%20Verified-blueviolet.svg)](USERS.md)
 [![Launch Cohort: 20 Partners](https://img.shields.io/badge/Launch%20Cohort-20%20Partners-teal.svg)](LAUNCH_USERS.md)
-[![Proposal: Level 6](https://img.shields.io/badge/Proposal-Level%206-gold.svg)](PROPOSAL.md)
 [![Feedback & Iterations](https://img.shields.io/badge/Feedback-Level%205%20%26%206-brightgreen.svg)](docs/FEEDBACK.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
