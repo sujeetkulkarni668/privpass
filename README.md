@@ -9,7 +9,6 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-privpass--xi.vercel.app-success?logo=vercel)](https://privpass-xi.vercel.app/)
 [![Preprod Users: 78+](https://img.shields.io/badge/Preprod%20Users-78%20Verified-blueviolet.svg)](USERS.md)
 [![Launch Cohort: 20 Partners](https://img.shields.io/badge/Launch%20Cohort-20%20Partners-teal.svg)](LAUNCH_USERS.md)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 PrivPass is a **privacy-preserving zero-knowledge identity verification platform** built on the
