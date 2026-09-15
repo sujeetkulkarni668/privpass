@@ -130,24 +130,13 @@ app.use("/api/v1", apiV1Router);
 app.use("/admin", adminRouter);
 app.use("/api/admin", adminRouter);
 
+import { errorHandler } from "./middleware/errorHandler.js";
+
 /* -------------------------------------------------------------------------- */
 /* Error handler                                                              */
 /* -------------------------------------------------------------------------- */
 
-app.use(
-  (
-    err: any,
-    req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction
-  ) => {
-    req.log?.error({ err }, "unhandled_error");
-
-    res.status(500).json({
-      error: "internal_error",
-    });
-  }
-);
+app.use(errorHandler);
 
 /* -------------------------------------------------------------------------- */
 /* Server                                                                     */
