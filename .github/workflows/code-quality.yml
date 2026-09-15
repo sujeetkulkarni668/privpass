@@ -1,0 +1,49 @@
+name: Code Quality & Security
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  typecheck-and-lint:
+    name: Typecheck & Lint (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Backend Typecheck
+        run: yarn --cwd backend tsc --noEmit
+
+      - name: Frontend Typecheck
+        run: yarn --cwd frontend tsc --noEmit
+
+  test-suites:
+    name: Unit Test Suites
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Run Backend Tests
+        run: yarn --cwd backend test
+      - name: Run Frontend Tests
+        run: yarn --cwd frontend test
