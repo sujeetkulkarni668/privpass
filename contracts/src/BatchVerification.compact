@@ -1,0 +1,32 @@
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+export struct BatchProofItem {
+  requestHash: Bytes<32>;
+  credentialRoot: Bytes<32>;
+  nullifier: Bytes<32>;
+  isValid: Boolean;
+}
+
+export ledger verifiedBatches: Map<Bytes<32>, Uint<64>>;
+export ledger processedNullifiers: Map<Bytes<32>, Boolean>;
+
+export circuit verifyBatchProof(
+  batchId: Bytes<32>,
+  proofCount: Uint<32>,
+  itemsMerkleRoot: Bytes<32>,
+  timestamp: Uint<64>
+): [] {
+  const discBatchId = disclose(batchId);
+  assert(!verifiedBatches.member(discBatchId), "batch already processed");
+  assert(proofCount > 0, "batch must contain at least one proof");
+
+  verifiedBatches.insert(discBatchId, disclose(timestamp));
+}
+
+export circuit recordProcessedNullifier(nullifier: Bytes<32>): [] {
+  const discNullifier = disclose(nullifier);
+  assert(!processedNullifiers.member(discNullifier), "nullifier already spent");
+  processedNullifiers.insert(discNullifier, true);
+}
