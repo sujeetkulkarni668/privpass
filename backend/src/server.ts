@@ -81,9 +81,14 @@ app.use(
   })
 );
 
+import { healthRouter } from "./routes/health.js";
+
 /* -------------------------------------------------------------------------- */
 /* Health checks                                                              */
 /* -------------------------------------------------------------------------- */
+
+app.use("/health", healthRouter);
+app.use("/api/health", healthRouter);
 
 app.get("/healthz", (_req, res) => {
   res.json({ ok: true });
