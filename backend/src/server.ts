@@ -18,8 +18,11 @@ import { requireUser } from "./middleware/auth.js";
 const helmet = helmetModule as any;
 const rateLimit = rateLimitModule as any;
 
+import { requestIdMiddleware } from "./middleware/requestId.js";
+
 const app = express();
 
+app.use(requestIdMiddleware);
 app.set("trust proxy", 1);
 /* -------------------------------------------------------------------------- */
 /* Security                                                                   */
