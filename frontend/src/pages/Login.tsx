@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api, setAccessToken } from "../lib/api.js";
 
+import Logo from "../components/Logo.js";
+
 function describeLoginError(err: unknown): string {
   const anyErr = err as { code?: string; message?: string } | undefined;
   const code = anyErr?.code ?? anyErr?.message;
@@ -33,9 +35,13 @@ export default function Login() {
   }
 
   return (
-    <main className="container" style={{ maxWidth: 420, paddingTop: 80 }}>
-      <h1 style={{ fontSize: "2rem" }}>Sign in</h1>
-      <form onSubmit={onSubmit} className="card" style={{ display: "grid", gap: 16 }}>
+    <main className="container" style={{ maxWidth: 420, paddingTop: 64, textAlign: "center" }}>
+      <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
+        <Logo size={48} showText={false} />
+      </div>
+      <h1 style={{ fontSize: "2rem", marginBottom: 24 }}>Sign in to PrivPass</h1>
+      <form onSubmit={onSubmit} className="card" style={{ display: "grid", gap: 16, textAlign: "left" }}>
+
         <div>
           <label htmlFor="username">Username</label>
           <input

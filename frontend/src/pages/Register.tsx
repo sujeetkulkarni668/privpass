@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api, setAccessToken } from "../lib/api.js";
 
+import Logo from "../components/Logo.js";
+
 function describeAuthError(err: unknown): string {
   const anyErr = err as { code?: string; details?: any; message?: string } | undefined;
   const code = anyErr?.code ?? anyErr?.message;
@@ -47,12 +49,16 @@ export default function Register() {
   }
 
   return (
-    <main className="container" style={{ maxWidth: 420, paddingTop: 80 }}>
-      <h1 style={{ fontSize: "2rem" }}>Create your account</h1>
-      <p style={{ color: "var(--slate)", marginTop: 0 }}>
+    <main className="container" style={{ maxWidth: 420, paddingTop: 64, textAlign: "center" }}>
+      <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
+        <Logo size={48} showText={false} />
+      </div>
+      <h1 style={{ fontSize: "2rem", marginBottom: 8 }}>Create your account</h1>
+      <p style={{ color: "var(--slate)", marginTop: 0, marginBottom: 24, fontSize: "0.9rem" }}>
         No wallet required to sign up — connect one later when issuing government documents.
       </p>
-      <form onSubmit={onSubmit} className="card" style={{ display: "grid", gap: 16 }}>
+      <form onSubmit={onSubmit} className="card" style={{ display: "grid", gap: 16, textAlign: "left" }}>
+
         <div>
           <label htmlFor="displayName">Full Name</label>
           <input

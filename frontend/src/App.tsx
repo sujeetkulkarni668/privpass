@@ -10,6 +10,8 @@ import History from "./pages/History.js";
 import CircuitSimulator from "./pages/CircuitSimulator.js";
 import { ConnectWalletButton } from "./components/WalletModal.js";
 
+import Logo from "./components/Logo.js";
+
 function TopBar() {
   const { pathname } = useLocation();
   const link = (to: string, label: string) => (
@@ -22,8 +24,9 @@ function TopBar() {
     <nav className="topbar">
       <div className="container">
         <Link to="/" className="brand">
-          <span style={{ color: "var(--signal-bright)", fontSize: "1.4rem" }}>🛡️</span> PrivPass
+          <Logo size={34} />
         </Link>
+
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           {link("/dashboard", "Dashboard")}
           {link("/credentials", "ID Wallet")}

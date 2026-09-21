@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#0F766E" />
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Dark Badge -->
+  <rect width="100" height="100" rx="24" fill="#080D1A" />
+  <rect x="1.5" y="1.5" width="97" height="97" rx="22.5" stroke="#1E293B" stroke-width="3" />
+
+  <!-- Outer Cryptographic Shield -->
+  <path d="M50 14 L78 26 C78 52 66 74 50 86 C34 74 22 52 22 26 Z" 
+        fill="url(#shieldGrad)" 
+        opacity="0.18" />
+  <path d="M50 14 L78 26 C78 52 66 74 50 86 C34 74 22 52 22 26 Z" 
+        stroke="url(#shieldGrad)" 
+        stroke-width="3.5" 
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#glow)" />
+
+  <!-- Inner ZK Nexus Geometric Key / Eye -->
+  <path d="M50 30 L66 38 C66 56 58 70 50 78 C42 70 34 56 34 38 Z" 
+        fill="#0B132B" 
+        stroke="url(#coreGrad)" 
+        stroke-width="2.5" />
+
+  <!-- Circuit nodes and Zero-Knowledge Keyhole Nexus -->
+  <circle cx="50" cy="46" r="6" fill="#F8FAFC" />
+  <path d="M47.5 50 L52.5 50 L54 62 L46 62 Z" fill="#F8FAFC" />
+  <circle cx="50" cy="46" r="3" fill="#10B981" />
+
+  <!-- Corner Circuit Accents -->
+  <circle cx="50" cy="22" r="2.5" fill="#34D399" />
+  <circle cx="68" cy="30" r="2.5" fill="#38BDF8" />
+  <circle cx="32" cy="30" r="2.5" fill="#38BDF8" />
+</svg>

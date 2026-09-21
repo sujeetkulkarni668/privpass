@@ -1,14 +1,19 @@
 import { Link } from "react-router-dom";
 import DisclosureManifest from "../components/DisclosureManifest.js";
+import Logo from "../components/Logo.js";
 
 export default function Landing() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="container" style={{ paddingTop: 80, paddingBottom: 64, textAlign: "center" }}>
+      <section className="container" style={{ paddingTop: 72, paddingBottom: 64, textAlign: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+          <Logo size={64} showText={false} />
+        </div>
         <div className="eyebrow" style={{ justifyContent: "center", marginBottom: 16 }}>
           ⚡ Midnight Network · Compact Smart Contracts · Zero-Knowledge Identity
         </div>
+
         <h1 style={{ maxWidth: 840, margin: "0 auto 20px" }}>
           Verify Identity.
           <br />
