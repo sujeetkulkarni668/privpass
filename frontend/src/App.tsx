@@ -7,6 +7,8 @@ import Credentials from "./pages/Credentials.js";
 import VerifyRequest from "./pages/VerifyRequest.js";
 import VerifierCreateRequest from "./pages/VerifierCreateRequest.js";
 import History from "./pages/History.js";
+import CircuitSimulator from "./pages/CircuitSimulator.js";
+import { ConnectWalletButton } from "./components/WalletModal.js";
 
 function TopBar() {
   const { pathname } = useLocation();
@@ -15,18 +17,23 @@ function TopBar() {
       {label}
     </Link>
   );
+
   return (
     <nav className="topbar">
       <div className="container">
         <Link to="/" className="brand">
-          PrivPass
+          <span style={{ color: "var(--signal-bright)", fontSize: "1.4rem" }}>🛡️</span> PrivPass
         </Link>
-        <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           {link("/dashboard", "Dashboard")}
-          {link("/credentials", "Wallet")}
+          {link("/credentials", "ID Wallet")}
+          {link("/circuits", "ZK Studio ⚡")}
           {link("/history", "History")}
-          {link("/verifier/requests/create", "For businesses")}
+          {link("/verifier/requests/create", "For Businesses")}
           {link("/login", "Sign in")}
+          <div style={{ marginLeft: 8 }}>
+            <ConnectWalletButton />
+          </div>
         </div>
       </div>
     </nav>
@@ -43,6 +50,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/credentials" element={<Credentials />} />
+        <Route path="/circuits" element={<CircuitSimulator />} />
         <Route path="/history" element={<History />} />
         <Route path="/verify/:requestId" element={<VerifyRequest />} />
         <Route path="/verifier/requests/create" element={<VerifierCreateRequest />} />

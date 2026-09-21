@@ -1,57 +1,67 @@
-/* PrivPass design tokens
-   ----------------------------------------------------------------
-   Palette:
-     --ink:        #0B1220  page ground, deep slate-navy (not pure black)
-     --ink-raised: #121B2E  cards / raised surfaces
-     --ink-line:   #223050  hairline borders
-     --paper:      #EDEFF5  primary text
-     --slate:      #8493B0  secondary text
-     --signal:     #3ECF8E  "will be disclosed" / verified / active
-     --withhold:   #E8A33D  "will NOT be disclosed" / pending
-     --danger:     #E8615D  revoked / failed
-
-   Type:
-     display  Fraunces   — headlines only, used with restraint
-     body     Inter      — UI text
-     data     IBM Plex Mono — claims, commitments, hashes, statuses
-   ---------------------------------------------------------------- */
+/* PrivPass 2.0 Design System & Tokens
+   ================================================================
+   Cyberpunk / Fintech Zero-Knowledge Aesthetic
+   ================================================================ */
 
 :root {
-  --ink: #0b1220;
-  --ink-raised: #121b2e;
-  --ink-raised-2: #17223a;
-  --ink-line: #223050;
-  --paper: #edeff5;
-  --slate: #8493b0;
-  --slate-dim: #5c6b8a;
-  --signal: #3ecf8e;
-  --signal-dim: #1f4d3d;
-  --withhold: #e8a33d;
-  --withhold-dim: #4d3c1f;
-  --danger: #e8615d;
-  --danger-dim: #4d2422;
+  --ink: #080d1a;
+  --ink-raised: #0f172a;
+  --ink-raised-2: #16223b;
+  --ink-raised-3: #1e2e4f;
+  --ink-line: #223254;
+  --ink-line-bright: #334b7a;
+
+  --paper: #f1f5f9;
+  --slate: #94a3b8;
+  --slate-dim: #64748b;
+  --slate-bright: #cbd5e1;
+
+  --signal: #10b981;
+  --signal-bright: #34d399;
+  --signal-dim: rgba(16, 185, 129, 0.15);
+  --signal-glow: rgba(16, 185, 129, 0.35);
+
+  --accent: #3b82f6;
+  --accent-bright: #60a5fa;
+  --accent-dim: rgba(59, 130, 246, 0.15);
+  --accent-glow: rgba(59, 130, 246, 0.35);
+
+  --withhold: #f59e0b;
+  --withhold-dim: rgba(245, 158, 11, 0.15);
+  --withhold-glow: rgba(245, 158, 11, 0.35);
+
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.15);
+  --danger-glow: rgba(239, 68, 68, 0.35);
+
+  --purple: #8b5cf6;
+  --purple-dim: rgba(139, 92, 246, 0.15);
 
   --font-display: "Fraunces", ui-serif, Georgia, serif;
-  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.18);
+  --shadow-signal: 0 0 25px rgba(16, 185, 129, 0.2);
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body,
-#root {
-  height: 100%;
+html, body, #root {
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--ink);
+  background: radial-gradient(circle at 50% 0%, #111d38 0%, var(--ink) 65%);
   color: var(--paper);
   font-family: var(--font-body);
   font-size: 16px;
@@ -59,23 +69,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 1.18;
   margin: 0 0 0.5em;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  color: var(--paper);
 }
 
 h1 {
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
 }
 
 h2 {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+}
+
+h3 {
+  font-size: 1.25rem;
 }
 
 p {
@@ -85,35 +97,25 @@ p {
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
-code,
-.mono {
+code, .mono {
   font-family: var(--font-data);
-  font-size: 0.9em;
+  font-size: 0.88em;
 }
 
-button,
-input,
-select {
+button, input, select, textarea {
   font-family: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--accent-bright);
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-}
-
 .container {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -121,9 +123,13 @@ select {
 .eyebrow {
   font-family: var(--font-data);
   font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--slate-dim);
+  color: var(--accent-bright);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .card {
@@ -131,20 +137,35 @@ select {
   border: 1px solid var(--ink-line);
   border-radius: var(--radius);
   padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
+.card:hover {
+  border-color: var(--ink-line-bright);
+}
+
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-bright);
+}
+
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 12px 20px;
+  padding: 11px 20px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease;
+  transition: all 0.15s ease;
+  user-select: none;
 }
 
 .btn:active {
@@ -152,35 +173,59 @@ select {
 }
 
 .btn-primary {
-  background: var(--signal);
-  color: #06231a;
+  background: linear-gradient(135deg, var(--signal) 0%, #059669 100%);
+  color: #022014;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
 .btn-primary:hover {
-  background: #4fe0a0;
+  background: linear-gradient(135deg, var(--signal-bright) 0%, #10b981 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.btn-accent:hover {
+  background: linear-gradient(135deg, var(--accent-bright) 0%, #3b82f6 100%);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
 }
 
 .btn-secondary {
-  background: transparent;
+  background: var(--ink-raised-2);
   border-color: var(--ink-line);
   color: var(--paper);
 }
 
 .btn-secondary:hover {
   border-color: var(--slate-dim);
+  background: var(--ink-raised-3);
 }
 
 .btn-danger {
   background: transparent;
-  border-color: var(--danger);
-  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
 }
 
+.btn-danger:hover {
+  background: var(--danger-dim);
+  border-color: var(--danger);
+  color: #ffffff;
+}
+
+/* Inputs */
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="number"],
-input:not([type]),
+input[type="date"],
+select,
 textarea {
   background: var(--ink);
   border: 1px solid var(--ink-line);
@@ -189,34 +234,125 @@ textarea {
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-input:focus {
-  border-color: var(--signal);
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 label {
   display: block;
   font-size: 0.85rem;
-  color: var(--slate);
+  font-weight: 500;
+  color: var(--slate-bright);
   margin-bottom: 6px;
 }
 
-/* --- The Disclosure Manifest: the app's signature UI element ---
-   A customs-declaration-style ledger of exactly what a verifier will
-   and will not receive. Used on the verification-request builder AND
-   the user's consent screen, so the same visual promise appears on
-   both sides of the transaction. */
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-data);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-line);
+}
+
+.badge-active {
+  color: var(--signal-bright);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--signal-dim);
+}
+
+.badge-pending {
+  color: var(--withhold);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: var(--withhold-dim);
+}
+
+.badge-revoked {
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: var(--danger-dim);
+}
+
+.badge-blue {
+  color: var(--accent-bright);
+  border-color: rgba(59, 130, 246, 0.35);
+  background: var(--accent-dim);
+}
+
+.badge-purple {
+  color: #c084fc;
+  border-color: rgba(192, 132, 252, 0.35);
+  background: rgba(192, 132, 252, 0.15);
+}
+
+/* Navigation Top Bar */
+nav.topbar {
+  border-bottom: 1px solid var(--ink-line);
+  position: sticky;
+  top: 0;
+  background: rgba(8, 13, 26, 0.88);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+nav.topbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+nav.topbar a {
+  text-decoration: none;
+  color: var(--slate);
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+
+nav.topbar a.active {
+  color: #ffffff;
+  background: var(--ink-raised-2);
+  border: 1px solid var(--ink-line);
+}
+
+nav.topbar a:hover:not(.active) {
+  color: var(--paper);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Disclosure Manifest UI */
 .manifest {
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px solid var(--ink-line);
   border-radius: var(--radius);
   overflow: hidden;
+  background: var(--ink);
 }
 
 .manifest-col {
-  padding: 20px;
+  padding: 22px;
 }
 
 .manifest-col + .manifest-col {
@@ -224,23 +360,24 @@ label {
 }
 
 .manifest-col.receive {
-  background: linear-gradient(180deg, var(--signal-dim), transparent 60%);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, transparent 80%);
 }
 
 .manifest-col.withhold {
-  background: linear-gradient(180deg, var(--withhold-dim), transparent 60%);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.12) 0%, transparent 80%);
 }
 
 .manifest-heading {
   font-family: var(--font-data);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  font-weight: 700;
   margin-bottom: 14px;
 }
 
 .manifest-col.receive .manifest-heading {
-  color: var(--signal);
+  color: var(--signal-bright);
 }
 
 .manifest-col.withhold .manifest-heading {
@@ -252,93 +389,162 @@ label {
   align-items: baseline;
   gap: 10px;
   font-family: var(--font-data);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   padding: 6px 0;
 }
 
 .manifest-item .mark {
-  width: 1em;
+  width: 1.2em;
   flex-shrink: 0;
+  font-weight: bold;
 }
 
 .manifest-col.receive .mark {
-  color: var(--signal);
+  color: var(--signal-bright);
 }
 
 .manifest-col.withhold .mark {
   color: var(--withhold);
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-data);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--ink-line);
+/* Digital ID Card Styling */
+.digital-id-card {
+  position: relative;
+  background: linear-gradient(135deg, #131d33 0%, #0d1527 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.badge-active {
-  color: var(--signal);
-  border-color: var(--signal-dim);
+.digital-id-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.digital-id-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), var(--shadow-glow);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.digital-id-card.card-pan {
+  border-top: 4px solid #3b82f6;
+}
+
+.digital-id-card.card-aadhaar {
+  border-top: 4px solid #f59e0b;
+}
+
+.digital-id-card.card-age {
+  border-top: 4px solid #10b981;
+}
+
+.digital-id-card.card-residency {
+  border-top: 4px solid #8b5cf6;
+}
+
+.digital-id-chip {
+  width: 38px;
+  height: 28px;
+  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+  border-radius: 5px;
+  border: 1px solid #e6ca65;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.digital-id-chip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.3);
+}
+
+/* Prover Animation Pipeline */
+.prover-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--ink-raised-2);
+  border: 1px solid var(--ink-line);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.prover-step.active {
+  border-color: var(--accent-bright);
+  background: var(--accent-dim);
+  box-shadow: var(--shadow-glow);
+}
+
+.prover-step.complete {
+  border-color: var(--signal);
   background: var(--signal-dim);
 }
 
-.badge-pending {
-  color: var(--withhold);
-  border-color: var(--withhold-dim);
-  background: var(--withhold-dim);
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--accent-bright);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
-.badge-revoked {
-  color: var(--danger);
-  border-color: var(--danger-dim);
-  background: var(--danger-dim);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.demo-watermark {
-  font-family: var(--font-data);
-  font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  color: var(--withhold);
-  border: 1px dashed var(--withhold-dim);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  display: inline-block;
-}
-
-nav.topbar {
-  border-bottom: 1px solid var(--ink-line);
-  position: sticky;
-  top: 0;
-  background: rgba(11, 18, 32, 0.85);
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 7, 15, 0.82);
   backdrop-filter: blur(8px);
-  z-index: 10;
-}
-
-nav.topbar .container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 64px;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
 }
 
-nav.topbar a {
-  text-decoration: none;
-  color: var(--slate);
-  font-size: 0.9rem;
+.modal-content {
+  background: var(--ink-raised);
+  border: 1px solid var(--ink-line-bright);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 580px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  animation: modalIn 0.2s ease;
 }
 
-nav.topbar a.active,
-nav.topbar a:hover {
-  color: var(--paper);
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.brand {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  color: var(--paper) !important;
+@media (max-width: 768px) {
+  .manifest {
+    grid-template-columns: 1fr;
+  }
+  .manifest-col + .manifest-col {
+    border-left: none;
+    border-top: 1px solid var(--ink-line);
+  }
 }

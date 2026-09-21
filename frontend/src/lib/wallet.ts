@@ -274,6 +274,12 @@ export function disconnectWallet(): void {
 
 // ── Session restore ───────────────────────────────────────────────────────────
 
+export function getShortAddress(address: string | null | undefined, headChars = 10, tailChars = 6): string {
+  if (!address) return "";
+  if (address.length <= headChars + tailChars) return address;
+  return `${address.slice(0, headChars)}...${address.slice(-tailChars)}`;
+}
+
 export function restoreWalletSession(): void {
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
@@ -286,3 +292,5 @@ export function restoreWalletSession(): void {
 }
 
 restoreWalletSession();
+
+

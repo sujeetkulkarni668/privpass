@@ -1,12 +1,36 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Build Outputs & Bundles
 dist/
+*/dist/
+*.tsbuildinfo
+build/
+
+# Environment variables & Local configs
 .env
 .env.*
 !.env.example
-*.log
-.DS_Store
-contracts/scripts/test-*.ts
+*.local
 
-*.tsbuildinfo
+# Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Redundant Lockfiles (Project strictly uses yarn.lock)
+package-lock.json
+
+# Temporary / Binary exports
+*.docx
+*.xlsx
+*.mp4
+contracts/scripts/test-*.ts
 /backend/generate-export.ts

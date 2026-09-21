@@ -11,7 +11,6 @@ export function setAccessToken(token: string | null) {
 
 // Wallet address is set by the wallet connection module (wallet.ts).
 // It is included in issuance requests as the X-Wallet-Address header.
-// The backend validates its presence before allowing document issuance.
 let connectedWalletAddress: string | null = null;
 export function setConnectedWalletAddress(address: string | null) {
   connectedWalletAddress = address;
@@ -27,16 +26,11 @@ async function request<T>(path: string, init: RequestInit = {}, extraHeaders?: R
     ...extraHeaders,
   };
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-  // Include wallet address in every request if available — the backend
-  // ignores it on endpoints that don't need it, and enforces it on /issue.
   if (connectedWalletAddress) headers["X-Wallet-Address"] = connectedWalletAddress;
 
   const res = await fetch(`${BASE}${path}`, { ...init, headers, credentials: "include" });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    // Surface the backend's error code AND any zod validation details, so
-    // callers can show the real reason instead of guessing from the
-    // string alone.
     const apiError = new Error(body.error ?? `request_failed_${res.status}`) as Error & {
       code?: string;
       details?: unknown;
@@ -84,19 +78,12 @@ export const api = {
       }[];
     }>("/verifications"),
 
-  // Credential issuance requires a connected wallet (X-Wallet-Address header).
-  // The header is automatically included by the request() helper above when
-  // connectedWalletAddress is set. The backend enforces wallet presence
-  // independently of this frontend behaviour.
-  issueCredential: (type: string) =>
-    request("/credentials/issue", { method: "POST", body: JSON.stringify({ type }) }),
+  issueCredential: (type: string, customWitness?: { value?: string; dob?: string; countryCode?: string }) =>
+    request("/credentials/issue", { method: "POST", body: JSON.stringify({ type, customWitness }) }),
 
   revokeCredential: (id: string, reason?: string) =>
     request(`/credentials/${id}/revoke`, { method: "POST", body: JSON.stringify({ reason }) }),
 
-  // Links the connected wallet address to the logged-in user account.
-  // Called after a successful wallet connection so the backend can store
-  // the wallet address for auditing and session continuity.
   linkWallet: (walletAddress: string) =>
     request("/auth/wallet", { method: "PUT", body: JSON.stringify({ walletAddress }) }),
 
@@ -128,7 +115,7 @@ export const api = {
     }),
 
   submitProof: (requestId: string, witnesses: Record<string, { salt: string; rawValue: string }>) =>
-    request<{ status: string; claimResults: Record<string, boolean>; proofValid: boolean }>(
+    request<{ status: string; claimResults: Record<string, boolean>; proofValid: boolean; nullifier?: string; blockHeight?: number }>(
       `/verifications/${requestId}/prove`,
       { method: "POST", body: JSON.stringify({ witnesses }) }
     ),
@@ -149,3 +136,52 @@ export const CLAIM_WITHHOLDS: Record<string, string> = {
   IDENTITY_VERIFIED: "PAN number, Aadhaar number",
   RESIDENCY_VALID: "Full address",
 };
+
+export interface IndustryPreset {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string;
+  requiredClaims: string[];
+  optionalClaims: string[];
+  recommendedOrg: string;
+}
+
+export const INDUSTRY_PRESETS: IndustryPreset[] = [
+  {
+    id: "fintech_kyc",
+    name: "Fintech KYC Tier 1",
+    tagline: "Essential compliance for banking, loan approvals, and payments.",
+    icon: "🏦",
+    requiredClaims: ["PAN_VALID", "AGE_OVER_18"],
+    optionalClaims: ["RESIDENCY_VALID"],
+    recommendedOrg: "Apex Global Finance",
+  },
+  {
+    id: "defi_age_gate",
+    name: "DeFi Age & Compliance Gate",
+    tagline: "Regulatory age-gating for high-yield vaults and derivative DEXes.",
+    icon: "⚡",
+    requiredClaims: ["AGE_OVER_18"],
+    optionalClaims: ["RESIDENCY_VALID"],
+    recommendedOrg: "Hyperion Protocol",
+  },
+  {
+    id: "crypto_exchange",
+    name: "Crypto Exchange Onboarding",
+    tagline: "Full zero-knowledge identity check without raw biometric storage.",
+    icon: "🪙",
+    requiredClaims: ["IDENTITY_VERIFIED", "AGE_OVER_18"],
+    optionalClaims: ["RESIDENCY_VALID"],
+    recommendedOrg: "Midnight Exchange Corp",
+  },
+  {
+    id: "sybil_airdrop",
+    name: "Sybil-Resistant Airdrop",
+    tagline: "Ensures 1 claim per unique human via on-chain nullifiers.",
+    icon: "🛡️",
+    requiredClaims: ["AADHAAR_VERIFIED"],
+    optionalClaims: [],
+    recommendedOrg: "Aura Network DAO",
+  },
+];

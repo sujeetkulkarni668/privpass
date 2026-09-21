@@ -1,58 +1,10 @@
 // VerificationRequest.compact
 //
-// On-chain record of a verifier's request for claims and its eventual
-// completion. Holds no sensitive identity data — only request metadata,
-// which claims were requested, and the boolean claim results.
+// Manages zero-knowledge verification requests, lifecycle state transitions,
+// cryptographic TTL timeouts, and selective disclosure claim evaluation.
 //
-// IMPORTANT DESIGN NOTE (fixed to close a real vulnerability):
-// The previous version of this contract let `completeRequest` accept a
-// caller-supplied `Vector<8, ClaimResult>` of plain booleans with no
-// cryptographic link to an actual proof. That meant *any* caller could
-// submit `true` for every claim without ever satisfying the
-// IdentityVerification circuits or holding a valid credential — i.e. it
-// was not actually a ZK-verified result, just a database write that
-// looked like one.
-//
-// This version instead composes directly into the IdentityVerification
-// circuits (the same pattern `proveIdentityVerified` already uses to call
-// `provePanValid`/`proveAadhaarVerified`) and cross-checks
-// CredentialRegistry status, so a claim can only end up `true` if:
-//   1. the caller supplied witnesses that open the stated commitment, AND
-//   2. the underlying predicate (age/format/etc.) holds, AND
-//   3. the credential behind that commitment is ACTIVE (not
-//      expired/revoked) as of `nowUnixSeconds`.
-//
-// Because Compact's Vector type is only ever constructed by the calling
-// TypeScript layer (never built element-by-element inside a circuit in
-// this codebase, and that syntax is not confirmed against the installed
-// compiler — see docs/compact-contracts.md), the previously-dynamic
-// "which of up to 8 claims" shape is replaced with one explicit
-// requested/commitment slot per claim type. `ClaimType` has exactly 5
-// variants, so this fully covers the claim space without needing runtime
-// iteration.
-//
-// HIGHEST-UNCERTAINTY PART OF THIS FILE — verify before compiling:
-// this file imports IdentityVerification.compact and CredentialRegistry.compact
-// using `import "path" prefix Name_;`, based on the one confirmed real
-// Compact example available while writing this (OpenZeppelin's
-// compact-contracts, which imports Ownable/Pausable/FungibleToken this way
-// and calls the resulting flat-named functions, e.g. `Ownable_initialize`).
-// That import form is documented as library-style composition — the
-// imported circuits/ledgers/enums are compiled into *this* contract's own
-// deployment, not called across two independently-deployed contract
-// instances. That is almost certainly what you want here (one PrivPass
-// verification contract that can check credential status and evaluate
-// identity claims internally), but confirm against the installed
-// `compactc`/`compact` CLI docs that: (a) `prefix` is the correct import
-// keyword for your version, (b) exported enums (e.g. `CredentialStatus`)
-// get the same prefix as exported circuits (used below as
-// `Registry_CredentialStatus.ACTIVE`), and (c) importing CredentialRegistry
-// here doesn't double-deploy conflicting ledger state if CredentialRegistry
-// is *also* deployed standalone. If your installed version instead requires
-// true cross-contract calls to a separately-deployed CredentialRegistry
-// (e.g. via a `ContractAddress`/`Contract<T>` reference type), the
-// `Registry_*` call sites below need to be adapted to that mechanism
-// instead — the authorization/enforcement *logic* stays the same either way.
+// Invariant: No raw PII is ever stored on-chain. Only request metadata,
+// requested claim masks, nullifiers, and boolean claim outcomes are recorded.
 
 pragma language_version >= 0.16;
 
@@ -77,6 +29,7 @@ export enum RequestStatus {
 
 witness requesterSecret(): Bytes<32>;
 witness requesterSalt(): Bytes<32>;
+witness userSecret(): Bytes<32>;
 witness dobUnixSeconds(): Uint<64>;
 witness commitmentSalt(): Bytes<32>;
 witness panRaw(): Bytes<16>;
@@ -106,10 +59,24 @@ export struct ClaimResults {
   residencyValid: Boolean;
   identityRequested: Boolean;
   identityVerified: Boolean;
+  nullifier: Bytes<32>;
 }
 
 export ledger requests: Map<Bytes<32>, RequestRecord>;
 export ledger results: Map<Bytes<32>, ClaimResults>;
+export ledger processedNullifiers: Map<Bytes<32>, Boolean>;
+
+// -------------------------------------------------------------------
+// Internal Circuit Verifiers
+// -------------------------------------------------------------------
+
+circuit isUpperAlpha(c: Uint<8>): Boolean {
+  return c >= 65 && c <= 90;
+}
+
+circuit isDigit(c: Uint<8>): Boolean {
+  return c >= 48 && c <= 57;
+}
 
 circuit proveAgeOver18Internal(credentialCommitment: Bytes<32>, nowUnixSeconds: Uint<64>): Boolean {
   const dob = dobUnixSeconds();
@@ -118,7 +85,7 @@ circuit proveAgeOver18Internal(credentialCommitment: Bytes<32>, nowUnixSeconds: 
   assert(recomputed == credentialCommitment, "commitment mismatch");
   assert(nowUnixSeconds >= dob, "invalid dob");
   const age = nowUnixSeconds - dob;
-  return age >= 568025136;
+  return age >= 568025136; // 18 years in seconds
 }
 
 circuit provePanValidInternal(credentialCommitment: Bytes<32>): Boolean {
@@ -126,7 +93,11 @@ circuit provePanValidInternal(credentialCommitment: Bytes<32>): Boolean {
   const salt = commitmentSalt();
   const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([pan, salt]);
   assert(recomputed == credentialCommitment, "commitment mismatch");
-  return pan[0] >= 65 && pan[0] <= 90;
+
+  // Validate full 10-char format [A-Z]{5}[0-9]{4}[A-Z]{1}
+  return isUpperAlpha(pan[0]) && isUpperAlpha(pan[1]) && isUpperAlpha(pan[2]) &&
+         isUpperAlpha(pan[3]) && isUpperAlpha(pan[4]) && isDigit(pan[5]) &&
+         isDigit(pan[6]) && isDigit(pan[7]) && isDigit(pan[8]) && isUpperAlpha(pan[9]);
 }
 
 circuit proveAadhaarVerifiedInternal(credentialCommitment: Bytes<32>): Boolean {
@@ -134,7 +105,12 @@ circuit proveAadhaarVerifiedInternal(credentialCommitment: Bytes<32>): Boolean {
   const salt = commitmentSalt();
   const recomputed = persistentHash<[Bytes<16>, Bytes<32>]>([aadhaar, salt]);
   assert(recomputed == credentialCommitment, "commitment mismatch");
-  return aadhaar[0] >= 48 && aadhaar[0] <= 57;
+
+  // Validate all 12 digits
+  return isDigit(aadhaar[0]) && isDigit(aadhaar[1]) && isDigit(aadhaar[2]) &&
+         isDigit(aadhaar[3]) && isDigit(aadhaar[4]) && isDigit(aadhaar[5]) &&
+         isDigit(aadhaar[6]) && isDigit(aadhaar[7]) && isDigit(aadhaar[8]) &&
+         isDigit(aadhaar[9]) && isDigit(aadhaar[10]) && isDigit(aadhaar[11]);
 }
 
 circuit proveResidencyValidInternal(credentialCommitment: Bytes<32>): Boolean {
@@ -148,6 +124,10 @@ circuit proveResidencyValidInternal(credentialCommitment: Bytes<32>): Boolean {
 circuit proveIdentityVerifiedInternal(panCommitment: Bytes<32>, aadhaarCommitment: Bytes<32>): Boolean {
   return provePanValidInternal(panCommitment) && proveAadhaarVerifiedInternal(aadhaarCommitment);
 }
+
+// -------------------------------------------------------------------
+// Request Lifecycle Circuits
+// -------------------------------------------------------------------
 
 export circuit createRequest(
   requestId: Bytes<32>,
@@ -223,6 +203,13 @@ export circuit completeRequest(
   assert(record.status == RequestStatus.PENDING, "request not pending");
   assert(disclose(nowUnixSeconds) < record.expiresAt, "request expired");
 
+  // Generate and assert nullifier to prevent double submission
+  const userSec = userSecret();
+  const nullifier = persistentHash<[Bytes<32>, Bytes<32>]>([userSec, requestId]);
+  const discNullifier = disclose(nullifier);
+  assert(!processedNullifiers.member(discNullifier), "nullifier already used for this request");
+  processedNullifiers.insert(discNullifier, true);
+
   const panOk = !record.panRequested || provePanValidInternal(panCommitment);
   const aadhaarOk = !record.aadhaarRequested || proveAadhaarVerifiedInternal(aadhaarCommitment);
   const ageOk = !record.ageRequested || proveAgeOver18Internal(ageCommitment, nowUnixSeconds);
@@ -239,7 +226,8 @@ export circuit completeRequest(
     residencyRequested: record.residencyRequested,
     residencyValid: disclose(record.residencyRequested && residencyOk),
     identityRequested: record.identityRequested,
-    identityVerified: disclose(record.identityRequested && identityOk)
+    identityVerified: disclose(record.identityRequested && identityOk),
+    nullifier: discNullifier
   };
 
   results.insert(discRequestId, claimResults);
