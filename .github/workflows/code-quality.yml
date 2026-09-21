@@ -17,33 +17,77 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Enable corepack (Yarn 4)
+        run: corepack enable
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
+          cache-dependency-path: 'yarn.lock'
 
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Generate Prisma client
+        run: yarn workspace @privpass/backend db:generate
+
       - name: Backend Typecheck
-        run: yarn --cwd backend tsc --noEmit
+        run: yarn workspace @privpass/backend typecheck
 
       - name: Frontend Typecheck
-        run: yarn --cwd frontend tsc --noEmit
+        run: yarn workspace @privpass/frontend typecheck
 
   test-suites:
     name: Unit Test Suites
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: privpass
+          POSTGRES_PASSWORD: privpass
+          POSTGRES_DB: privpass_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Enable corepack (Yarn 4)
+        run: corepack enable
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'yarn'
+          cache-dependency-path: 'yarn.lock'
+
       - name: Install dependencies
         run: yarn install --immutable
+
+      - name: Generate Prisma client
+        run: yarn workspace @privpass/backend db:generate
+
+      - name: Run database migrations
+        run: yarn workspace @privpass/backend db:migrate
+        env:
+          DATABASE_URL: postgresql://privpass:privpass@localhost:5432/privpass_test
+
       - name: Run Backend Tests
-        run: yarn --cwd backend test
+        run: yarn workspace @privpass/backend test
+        env:
+          DATABASE_URL: postgresql://privpass:privpass@localhost:5432/privpass_test
+          JWT_ACCESS_SECRET: ci-test-secret-32charmin-padding-x
+          WEBHOOK_ENCRYPTION_KEY: 085bc453cede392b913c4c708ec0fa0b7715a6590b15ef4a295e1b36da3ce554085bc453cede392b913c4c708ec0fa0b7715a6590b15ef4a295e1b36da3ce554
+
       - name: Run Frontend Tests
-        run: yarn --cwd frontend test
+        run: yarn workspace @privpass/frontend test
+
+      - name: Run Contract Tests
+        run: yarn workspace @privpass/contracts test
